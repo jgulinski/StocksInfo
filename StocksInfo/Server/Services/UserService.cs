@@ -75,7 +75,8 @@ public class UserService : IUserService
 
         return new StatusResponse()
         {
-            StatusCode = HttpStatusCode.OK, Content = new {accessToken = tokens[0], refreshToken = tokens[1]}
+            // StatusCode = HttpStatusCode.OK, Content = new {accessToken = tokens[0], refreshToken = tokens[1]}
+            StatusCode = HttpStatusCode.OK, Content = tokens[0]
         };
     }
 

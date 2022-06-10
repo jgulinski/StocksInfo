@@ -10,10 +10,11 @@ public class AuthHelper
 {
     public static JwtSecurityToken GenerateToken(User user, string issuer, string key)
     {
-        Claim[] userClaims =
+        List<Claim> userClaims = new()
         {
-            new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()),
-            new Claim(ClaimTypes.Email, user.EmailAddress),
+            new Claim(JwtRegisteredClaimNames.Sub, user.EmailAddress),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString())
         };
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));

@@ -12,13 +12,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy",
-        builder =>
-            builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+     options.AddPolicy("CorsPolicy",
+         builder =>
+             builder
+                 .AllowAnyOrigin()
+                 .AllowAnyMethod()
+                 .AllowAnyHeader());
 });
+
+// builder.Services.AddCors(opt =>
+// {
+//      opt.AddPolicy(name: "AllowBlazorOrigin",
+//          b =>
+//          {
+//              b.WithOrigins("https://localhost:7115");
+//          });
+// });
 
 builder.Services.AddDbContext<ApiContext>(opt =>
 {
@@ -60,9 +69,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors("CorsPolicy");
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    app.MapControllers();
+});
 
 app.MapControllers();
 

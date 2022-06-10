@@ -31,7 +31,7 @@ public class UserController : ControllerBase
         return Ok("User registered");
     }
     
-    [Route("login")]
+    [Route("signIn")]
     [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Login([FromBody] UserDto user)

@@ -1,0 +1,39 @@
+@using Client.Services
+@inject IStockService _stockService
+@using Blazored.Typeahead
+@inject NavigationManager _navigationManager
+<BlazoredTypeahead SearchMethod="@SearchStock"
+                   TValue="FoundStockDto"
+                   TItem="FoundStockDto"
+                   Value="selectedStock"
+                   ValueChanged="HandleSearch"
+                   ValueExpression="@(() => selectedStock)"
+                   placeholder="Search...">
+    <SelectedTemplate>
+        @context.Name
+    </SelectedTemplate>
+    <ResultTemplate>
+        @context.Name
+    </ResultTemplate>
+    <NotFoundTemplate>
+        Sorry, there weren't any products found.
+    </NotFoundTemplate>
+</BlazoredTypeahead>
+
+@code
+{
+    private FoundStockDto selectedStock;
+
+    private async Task<IEnumerable<FoundStockDto>> SearchStock(string searchText)
+    {
+        var response = await _stockService.SearchStocks(searchText);
+        return response;
+    }
+
+    private void HandleSearch(FoundStockDto foundStockDto)
+    {
+        if (foundStockDto == null) return;
+        selectedStock = foundStockDto;
+        _navigationManager.NavigateTo($"/stocks/{foundStockDto.TickerSymbol}");
+    }
+}

@@ -112,7 +112,7 @@ public class StockService : IStockService
             {
                 stocksFound.Add(new FoundStockDto()
                 {
-                    Ticker = stock.ticker,
+                    TickerSymbol = stock.ticker,
                     Name = stock.name,
                     PrimaryExchange = stock.primary_exchange,
                 });
