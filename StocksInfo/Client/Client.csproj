@@ -7,8 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Altasoft.IdentityModel.Tokens.Jwt" Version="1.0.1" />
+        <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+        <PackageReference Include="Blazored.Typeahead" Version="4.6.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
+        <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.59" />
+        <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
 </Project>
