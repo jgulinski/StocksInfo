@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{9F280F1B-6265-4EAE-93C2-E1EBAE658371}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{255B0941-E7AD-4A38-97E6-266A17E7CDE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{38C3B20D-AF57-41B4-90E0-94DB7562AFED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F280F1B-6265-4EAE-93C2-E1EBAE658371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F280F1B-6265-4EAE-93C2-E1EBAE658371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F280F1B-6265-4EAE-93C2-E1EBAE658371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F280F1B-6265-4EAE-93C2-E1EBAE658371}.Release|Any CPU.Build.0 = Release|Any CPU
+		{255B0941-E7AD-4A38-97E6-266A17E7CDE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{255B0941-E7AD-4A38-97E6-266A17E7CDE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{255B0941-E7AD-4A38-97E6-266A17E7CDE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{255B0941-E7AD-4A38-97E6-266A17E7CDE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38C3B20D-AF57-41B4-90E0-94DB7562AFED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38C3B20D-AF57-41B4-90E0-94DB7562AFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38C3B20D-AF57-41B4-90E0-94DB7562AFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38C3B20D-AF57-41B4-90E0-94DB7562AFED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
