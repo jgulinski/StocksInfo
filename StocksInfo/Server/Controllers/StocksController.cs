@@ -1,12 +1,13 @@
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
-using Shared.Models.Aggregates;
 
 namespace Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class StocksController : ControllerBase
 {
     private readonly IStockService _stockService;
@@ -15,17 +16,18 @@ public class StocksController : ControllerBase
     {
         _stockService = stockService;
     }
-    
+
     [HttpGet]
     [Route("{ticker}")]
     public async Task<IActionResult> GetStockInfo(string ticker)
     {
         var response = await _stockService.GetStockAsync(ticker);
-        
+
         if (response.StatusCode != HttpStatusCode.OK)
         {
             return StatusCode((int) response.StatusCode, response.Content);
         }
+
         return Ok(response.Content);
     }
 
@@ -34,11 +36,12 @@ public class StocksController : ControllerBase
     public async Task<IActionResult> GetStockSearchResult(string searchText)
     {
         var response = await _stockService.GetStocksSearchResultAsync(searchText);
-        
+
         if (response.StatusCode != HttpStatusCode.OK)
         {
             return StatusCode((int) response.StatusCode, response.Content);
         }
+
         return Ok(response.Content);
     }
 
@@ -47,12 +50,12 @@ public class StocksController : ControllerBase
     public async Task<IActionResult> GetStockAggregates(string ticker)
     {
         var response = await _stockService.GetAggregatesAsync(ticker);
-        
+
         if (response.StatusCode != HttpStatusCode.OK)
         {
             return StatusCode((int) response.StatusCode, response.Content);
         }
+
         return Ok(response.Content);
     }
-    
 }

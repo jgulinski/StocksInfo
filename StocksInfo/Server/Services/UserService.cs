@@ -71,12 +71,8 @@ public class UserService : IUserService
         };
     }
   private async Task<string> GenerateToken(User user)
-    {
-        var token = AuthHelper.GenerateToken(user, _configuration["Jwt:Issuer"], _configuration["Jwt:Key"]);
-    
-        // _context.Users.Update(user);
-        // await _context.SaveChangesAsync();
-    
+  {
+      var token = AuthHelper.GenerateToken(user, _configuration["Jwt:Issuer"], _configuration["Jwt:Key"]);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

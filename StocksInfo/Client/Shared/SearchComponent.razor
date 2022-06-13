@@ -2,6 +2,8 @@
 @inject IStockService _stockService
 @using Blazored.Typeahead
 @inject NavigationManager _navigationManager
+
+
 <BlazoredTypeahead SearchMethod="@SearchStock"
                    TValue="FoundStockDto"
                    TItem="FoundStockDto"

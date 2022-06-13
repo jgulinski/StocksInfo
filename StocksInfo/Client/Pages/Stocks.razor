@@ -1,14 +1,17 @@
 @page "/stocks/{Ticker}"
-@using System.Reflection.Metadata
 @inherits StocksBase
-@inject NavigationManager _navigationManager
+@inject HttpClient _httpClient
 
 
+@if (!isAuthenticated)
+{
+    <h1>You are not authorized to access this page</h1>
+}
+else
+{
 @if (Stock == null && ErrorMessage == null)
 {
-    <div class="spinner">
-        <SfSpinner Visible="true"></SfSpinner>
-    </div>
+    <p>Loading...</p>
 }
 else if (ErrorMessage != null)
 {
@@ -19,18 +22,7 @@ else
     <div class="row">
         <h3 class="col-10 mb-5">Dashboard</h3>
         <div class="col-2">
-            <a @onclick="@AddToWatchList" class="btn btn-primary">Add to watchlist</a>
-
-            @code {
-
-                private void AddToWatchList()
-                {
-                    _navigationManager.NavigateTo($"/stocks/AAPL");
-
-                // _stockService.GetStockInfo("AAPL");
-                }
-
-            }
+            <AddToWatchListButton Ticker=@Stock.TickerSymbol></AddToWatchListButton>
 
         </div>
     </div>
@@ -50,45 +42,46 @@ else
             <h3>@Stock.Name</h3>
             <p class="mb-4">@Stock.Description</p>
         </div>
-        </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                @if (Stock.HomepageUrl != null)
-                {
-                    <div class="mb-4">
-                        <h4>Homepage</h4>
-                        <a rel="stylesheet" href=@Stock.HomepageUrl target="_blank">@Stock.HomepageUrl</a>
-                    </div>
-                }
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            @if (Stock.HomepageUrl != null)
+            {
+                <div class="mb-4">
+                    <h4>Homepage</h4>
+                    <a rel="stylesheet" href=@Stock.HomepageUrl target="_blank">@Stock.HomepageUrl</a>
+                </div>
+            }
 
-                @if (Stock.IndustrialClassification != null)
-                {
-                    <div class="mb-4">
-                        <h4>Industrial classification</h4>
-                        @Stock.IndustrialClassification
-                    </div>
-                }
-            </div>
-            <div class="col-md-6 mb-4">
-                @if (Stock.ListDate != null)
-                {
-                    <div class="mb-4">
-                        <h4>Created</h4>
-                        @DateOnly.FromDateTime(Stock.ListDate.Value)
-                    </div>
-                }
-                @if (Stock.PrimaryExchange != null)
-                {
-                    <div class="mb-4">
-                        <h4>Primary exchange</h4>
-                        @Stock.PrimaryExchange
-                    </div>
-                }
-            </div>
+            @if (Stock.IndustrialClassification != null)
+            {
+                <div class="mb-4">
+                    <h4>Industrial classification</h4>
+                    @Stock.IndustrialClassification
+                </div>
+            }
         </div>
+        <div class="col-md-6 mb-4">
+            @if (Stock.ListDate != null)
+            {
+                <div class="mb-4">
+                    <h4>Created</h4>
+                    @DateOnly.FromDateTime(Stock.ListDate.Value)
+                </div>
+            }
+            @if (Stock.PrimaryExchange != null)
+            {
+                <div class="mb-4">
+                    <h4>Primary exchange</h4>
+                    @Stock.PrimaryExchange
+                </div>
+            }
+        </div>
+    </div>
 
     <div>
         <Chart Ticker="@Stock.TickerSymbol"></Chart>
     </div>
+}
 }

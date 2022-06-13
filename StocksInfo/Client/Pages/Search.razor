@@ -1,3 +1,28 @@
 @page "/search"
-<h3>Search</h3>
-<SearchComponent/>
+
+@if (!isAuthenticated)
+{
+    <h1>You are not authorized to access this page</h1>
+}
+else
+{
+    <h3>Search</h3>
+    <SearchComponent/>
+}
+
+@code
+{
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected bool isAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationState).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            isAuthenticated = true;
+        }
+    }
+}

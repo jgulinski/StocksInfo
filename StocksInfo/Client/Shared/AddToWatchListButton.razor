@@ -1,0 +1,36 @@
+@inject HttpClient _httpClient
+@using Blazored.LocalStorage
+@using Microsoft.IdentityModel.JsonWebTokens
+
+<a @onclick="@AddToWatchList" class="btn btn-primary">Add to watchlist</a>
+
+@code {
+
+    private void AddToWatchList()
+    {
+        _httpClient.PostAsJsonAsync($"/user/{Username}/watchlist", Ticker);
+    }
+
+    [Inject]
+    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    [Inject]
+    ILocalStorageService _localStorageService { get; set; }
+
+    public string Username { get; set; }
+
+    [Parameter]
+    public string Ticker { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await _localStorageService.ContainKeyAsync("bearerToken"))
+        {
+            string savedToken = await _localStorageService.GetItemAsync<string>("bearerToken");
+
+            var handler = new JsonWebTokenHandler();
+            Username = handler.ReadJsonWebToken(savedToken).Subject;
+        }
+    }
+
+}

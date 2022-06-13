@@ -53,9 +53,12 @@ public class StockService : IStockService
                 Description = stockInfoDto.results.description,
                 IndustrialClassification = stockInfoDto.results.sic_description,
                 HomepageUrl = stockInfoDto.results.homepage_url,
-                ListDate = DateTime.Parse(stockInfoDto.results.list_date),
             };
 
+            if (stockInfoDto.results.list_date != null)
+            {
+                stock.ListDate = DateTime.Parse(stockInfoDto.results.list_date);
+            }
             if (stockInfoDto.results.branding != null)
             {
                 if (stockInfoDto.results.branding.logo_url != null)

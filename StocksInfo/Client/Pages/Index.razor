@@ -1,7 +1,50 @@
 ﻿@page "/"
+@using Blazored.LocalStorage
+@using Client.Providers
+@using System.Net.Http.Headers
+@using Microsoft.IdentityModel.JsonWebTokens
+@inject HttpClient _httpClient
 
-<div class="h-100 d-flex align-items-center justify-content-center">
-    <h3>Welcome to Stock info app. Please sign in</h3>
-    @* <a href="/register" class="btn btn-primary btn-lg">Register</a> *@
-    @* <a href="/signin" class="btn btn-primary btn-lg">Sign in</a> *@
-</div>
+
+@if (!isAuthenticated)
+{
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <h3>Welcome to Stock info app. Please sign in</h3>@username
+    </div>
+}
+else
+{
+    <h1>Welcome @username</h1>
+}
+
+@code
+{
+    [Inject]
+    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    [Inject]
+    ILocalStorageService _localStorageService { get; set; }
+
+    bool isAuthenticated = false;
+
+    public string username { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await _localStorageService.ContainKeyAsync("bearerToken"))
+        {
+            isAuthenticated = true;
+            string savedToken = await _localStorageService.GetItemAsync<string>("bearerToken");
+
+            var handler = new JsonWebTokenHandler();
+            username = handler.ReadJsonWebToken(savedToken).Subject;
+
+            await ((AppAuthenticationStateProvider) AuthenticationStateProvider).SignIn();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
+
+            StateHasChanged();
+        }
+    }
+
+}
