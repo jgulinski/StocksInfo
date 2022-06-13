@@ -4,6 +4,8 @@ namespace Server.Services;
 
 public interface IStockService
 { 
-    Task<Stock?> GetStockAsync(string ticker);
-    Task<List<FoundStockDto>> GetStocksSearchResultAsync(string searchText);
+    Task<StatusResponse> GetStockAsync(string ticker);
+    Task<StatusResponse> GetStocksSearchResultAsync(string searchText);
+    Task<StatusResponse> GetAggregatesAsync(string ticker);
+
 }

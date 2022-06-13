@@ -1,0 +1,30 @@
+@page "/chart/{Ticker}"
+@using global::Shared.Models.Aggregates
+@inherits ChartBase
+@inject IIgniteUIBlazor IgniteUIBlazor
+
+@if (Aggregates == null && ErrorMessage == null)
+{
+    <div class="spinner">
+        <SfSpinner Visible="true"></SfSpinner>
+    </div>
+}
+else if (ErrorMessage != null)
+{
+    <DisplayError ErrorMessage="@ErrorMessage"></DisplayError>
+}
+else
+{
+    <div class="container vertical">
+        <div class="container vertical">
+            <IgbFinancialChart Width="1000px"
+                               Height="400px"
+                               ChartType=FinancialChartType.Candle
+                               Thickness=2
+                               DataSource="Aggregates"
+
+                               ZoomSliderType="FinancialChartZoomSliderType.None"
+                               YAxisMode="FinancialChartYAxisMode.Numeric"/>
+        </div>
+    </div>
+}

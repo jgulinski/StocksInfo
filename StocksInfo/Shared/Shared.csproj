@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="IgniteUI.Blazor" Version="21.2.73" />
+    </ItemGroup>
+
 </Project>

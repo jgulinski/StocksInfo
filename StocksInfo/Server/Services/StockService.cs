@@ -2,6 +2,8 @@ using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Server.Entities;
 using Shared.Models;
+using Shared.Models.Aggregates;
+using Result = Shared.Models.Aggregates.Result;
 
 namespace Server.Services;
 
@@ -20,14 +22,18 @@ public class StockService : IStockService
     }
 
 
-    public async Task<Stock?> GetStockAsync(string ticker)
+    public async Task<StatusResponse> GetStockAsync(string ticker)
     {
         ticker = ticker.ToUpper();
-        var stockInfo = await _context.Stocks.SingleOrDefaultAsync(e => e.TickerSymbol == ticker);
+        var stock = await _context.Stocks.SingleOrDefaultAsync(e => e.TickerSymbol == ticker);
 
-        if (stockInfo != null)
+        if (stock != null)
         {
-            return stockInfo;
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = stock
+            };
         }
 
         var url =
@@ -37,13 +43,9 @@ public class StockService : IStockService
 
         if (response.IsSuccessStatusCode)
         {
-            // if (response.StatusCode == HttpStatusCode.NoContent)
-            // {
-            //     return null;
-            // }
             var stockInfoDto = await response.Content.ReadFromJsonAsync<StockJsonModel>();
 
-            stockInfo = new Stock()
+            stock = new Stock()
             {
                 TickerSymbol = stockInfoDto.results.ticker,
                 Name = stockInfoDto.results.name,
@@ -58,27 +60,21 @@ public class StockService : IStockService
             {
                 if (stockInfoDto.results.branding.logo_url != null)
                 {
-                    stockInfo.ImgUrl = stockInfoDto.results.branding.logo_url;
+                    stock.ImgUrl = stockInfoDto.results.branding.logo_url;
                 }
                 else
                 {
-                    stockInfo.ImgUrl = stockInfoDto.results.branding.icon_url;
+                    stock.ImgUrl = stockInfoDto.results.branding.icon_url;
                 }
+
+                stock.ImgUrl += $"?apiKey={_configuration["apiKey"]}";
             }
 
-            await _context.Stocks.AddAsync(stockInfo);
+            await _context.Stocks.AddAsync(stock);
             await _context.SaveChangesAsync();
         }
         else
         {
-            // var stockInfoDto = await response.Content.ReadFromJsonAsync<StockInfoDTO>();
-            //
-            //
-            // if (stockInfoDto.error == requestLimitExceededText)
-            // {
-            //
-            // }
-
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
                 await Task.Delay(TimeSpan.FromSeconds(20));
@@ -86,29 +82,36 @@ public class StockService : IStockService
             }
 
             var message = await response.Content.ReadAsStringAsync();
-            throw new Exception(message);
+
+            return new StatusResponse()
+            {
+                StatusCode = response.StatusCode,
+                Content = message
+            };
         }
 
-        return stockInfo;
+        return new StatusResponse()
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = stock
+        };
     }
 
-    public async Task<List<FoundStockDto>> GetStocksSearchResultAsync(string token)
+    public async Task<StatusResponse> GetStocksSearchResultAsync(string token)
     {
         var url = "https://api.polygon.io/v3/reference/tickers?ticker.gte=" + token.ToUpper() +
                   $"&active=true&sort=ticker&order=asc&limit=5&apiKey={_configuration["apiKey"]}";
 
-
         var response = await _httpClient.GetAsync(url);
-
 
         if (response.IsSuccessStatusCode)
         {
-            var stockSearchResult = response.Content.ReadFromJsonAsync<StocksSearchResultJsonModel>();
+            var stockSearchResult = await response.Content.ReadFromJsonAsync<StocksSearchResultJsonModel>();
 
             var stocksFound = new List<FoundStockDto>();
 
 
-            foreach (var stock in stockSearchResult.Result.results)
+            foreach (var stock in stockSearchResult.results)
             {
                 stocksFound.Add(new FoundStockDto()
                 {
@@ -118,7 +121,11 @@ public class StockService : IStockService
                 });
             }
 
-            return stocksFound;
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = stocksFound
+            };
         }
 
         if (response.StatusCode == HttpStatusCode.TooManyRequests)
@@ -129,6 +136,94 @@ public class StockService : IStockService
 
         var message = await response.Content.ReadAsStringAsync();
 
-        throw new Exception(message);
+        return new StatusResponse()
+        {
+            StatusCode = response.StatusCode,
+            Content = message
+        };
+    }
+
+    public async Task<StatusResponse> GetAggregatesAsync(string ticker)
+    {
+        var toDate = DateTime.Today.AddDays(-1);
+        var fromDate = DateTime.Today.AddDays(-121);
+
+        var aggregates = await _context
+            .Aggregates.Where(e => e.TickerSymbol == ticker &&  e.Date > fromDate).ToListAsync();
+
+        if (aggregates.Count > 0)
+        {
+            fromDate = aggregates.OrderByDescending(e => e.Date).FirstOrDefault().Date.AddDays(1);
+
+            if (fromDate.AddDays(-1) == toDate)
+            {
+                return new StatusResponse()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = aggregates
+                };
+            }
+        }
+
+        var url =
+            $"https://api.polygon.io/v2/aggs/ticker/{ticker}" +
+            $"/range/1/day/" +
+            $"{fromDate.ToString("yyyy-MM-dd")}/" +
+            $"{toDate.ToString("yyyy-MM-dd")}" +
+            $"?adjusted=false&sort=asc&limit=120&apiKey={_configuration["apiKey"]}";
+
+        var response = await _httpClient.GetAsync(url);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var stockSearchResult = await response.Content.ReadFromJsonAsync<StockAggregateJsonModel>();
+            var newAggregates = new List<Aggregate>();
+            if (stockSearchResult.resultsCount != 0)
+            {
+                newAggregates = stockSearchResult.results.ConvertAll(e => new Aggregate()
+                    {
+                        TickerSymbol = ticker,
+                        Date = DateTimeOffset.FromUnixTimeMilliseconds(e.t).UtcDateTime,
+                        Open = e.o,
+                        Close = e.c,
+                        High = e.h,
+                        Low = e.l,
+                        NumberOfTransactions = e.n,
+                        // Volume = e.v,
+                        AveragePrice = e.vw
+                    }
+                ).ToList();
+                await _context.Aggregates.AddRangeAsync(newAggregates);
+                await _context.SaveChangesAsync();
+            }
+            
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = aggregates.Concat(newAggregates).ToList()
+            };
+        }
+
+        if (aggregates.Count != 0)
+        {
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = aggregates
+            };
+        }
+        
+        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(20));
+            return await GetAggregatesAsync(ticker);
+        }
+
+        return new StatusResponse()
+        {
+            StatusCode = response.StatusCode,
+            Content = await response.Content.ReadAsStringAsync()
+        };
     }
 }
+

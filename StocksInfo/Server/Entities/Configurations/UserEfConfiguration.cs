@@ -13,8 +13,6 @@ public class UserEfConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(e => e.EmailAddress).IsRequired().HasMaxLength(256);
         builder.Property(e => e.Password).IsRequired().HasMaxLength(256);
-        builder.Property(e => e.RefreshToken).IsRequired(false);
-        builder.Property(e => e.RefreshTokenExpirationDateTime).IsRequired(false);
 
         builder.ToTable("User");
     }

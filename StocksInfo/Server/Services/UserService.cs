@@ -63,60 +63,20 @@ public class UserService : IUserService
         {
             return new StatusResponse() {StatusCode = HttpStatusCode.BadRequest, Content = "Wrong password"};
         }
-
-        if (verifiedPassword == PasswordVerificationResult.SuccessRehashNeeded)
-        {
-            // string hashedPassword = new PasswordHasher<User>()
-            // .HashPassword(userFromDb, );
-        }
-
-        var tokens = await GenerateTokensAndUpdateUserTokens(userFromDb);
-
-
-        return new StatusResponse()
-        {
-            // StatusCode = HttpStatusCode.OK, Content = new {accessToken = tokens[0], refreshToken = tokens[1]}
-            StatusCode = HttpStatusCode.OK, Content = tokens[0]
-        };
-    }
-
-    public async Task<StatusResponse> RefreshAccessTokenAsync(string refreshToken)
-    {
-        var user = await _context.Users.Where(e => e.RefreshToken == refreshToken).FirstOrDefaultAsync();
-
-        if (user == null)
-        {
-            return new StatusResponse()
-                {StatusCode = HttpStatusCode.BadRequest, Content = "refresh token doesn't exist"};
-        }
-
-        if (user.RefreshTokenExpirationDateTime < DateTime.Now)
-        {
-            return new StatusResponse() {StatusCode = HttpStatusCode.BadRequest, Content = "refresh token expired"};
-        }
+        var token = await GenerateToken(userFromDb);
         
-        
-        var token = AuthHelper.GenerateToken(user, _configuration["Jwt:Issuer"], _configuration["Jwt:Key"]);
-
-
         return new StatusResponse()
         {
             StatusCode = HttpStatusCode.OK, Content = token
         };
     }
-
-    private async Task<string[]> GenerateTokensAndUpdateUserTokens(User user)
+  private async Task<string> GenerateToken(User user)
     {
         var token = AuthHelper.GenerateToken(user, _configuration["Jwt:Issuer"], _configuration["Jwt:Key"]);
-        var refreshToken = Guid.NewGuid();
-
-        user.RefreshToken = refreshToken.ToString();
-        user.RefreshTokenExpirationDateTime = DateTime.Now.AddMinutes(20);
-
-        _context.Users.Update(user);
-
-        await _context.SaveChangesAsync();
-
-        return new[] {new JwtSecurityTokenHandler().WriteToken(token), refreshToken.ToString()};
+    
+        // _context.Users.Update(user);
+        // await _context.SaveChangesAsync();
+    
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

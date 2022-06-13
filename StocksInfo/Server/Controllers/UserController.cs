@@ -22,7 +22,7 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] UserDto user)
     {
-        StatusResponse response = await _userService.RegisterUserAsync(user);
+        var response = await _userService.RegisterUserAsync(user);
         
         if (response.StatusCode != HttpStatusCode.OK)
         {
@@ -36,24 +36,11 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Login([FromBody] UserDto user)
     {
-        StatusResponse response = await _userService.LoginUserAsync(user);
+        var response = await _userService.LoginUserAsync(user);
         
         if (response.StatusCode != HttpStatusCode.OK)
         {
             return StatusCode((int) response.StatusCode, response.Content);
-        }
-        return Ok(response.Content);
-    }
-    
-    [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
-    {
-        StatusResponse response = await _userService.RefreshAccessTokenAsync(refreshToken);
-
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-            return StatusCode((int) response.StatusCode, response.Content);
-
         }
         return Ok(response.Content);
     }

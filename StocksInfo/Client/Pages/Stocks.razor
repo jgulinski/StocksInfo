@@ -1,15 +1,13 @@
 @page "/stocks/{Ticker}"
+@using System.Reflection.Metadata
 @inherits StocksBase
 @inject NavigationManager _navigationManager
-@using Client.Services
-@inject HttpClient _httpClient
-@inject IStockService _stockService
 
 
 @if (Stock == null && ErrorMessage == null)
 {
     <div class="spinner">
-        @* <SfSpinner Visible="true"></SfSpinner> *@
+        <SfSpinner Visible="true"></SfSpinner>
     </div>
 }
 else if (ErrorMessage != null)
@@ -37,77 +35,60 @@ else
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-5">
-            @if (Stock.ImgUrl != null)
-            {
+    <div class="row ms-4 me-4">
+        @if (Stock.ImgUrl != null)
+        {
+            <div class="col-md-4 mb-4">
+
                 <div class="logo">
-                    <img class="img-fluid" width="250" src="@Stock.ImgUrl?apiKey=QRvdUtJr_Ezx7UZp7wsAYp18dpxmaxmI">
+                    <img class="img-fluid" width="250" src="@Stock.ImgUrl">
                 </div>
-            }
-        </div>
-        <div class="col-md-8">
+
+            </div>
+        }
+        <div class="col-md-8 mb-4">
             <h3>@Stock.Name</h3>
             <p class="mb-4">@Stock.Description</p>
         </div>
+        </div>
 
-    </div>
-    <div class="mb-4 mt-4">
-        @if (Stock.ListDate != null)
-        {
-            <p class="mb-4">
-                Created: @Stock.ListDate.Value.Day.@Stock.ListDate.Value.Month.@Stock.ListDate.Value.Year ZMIENIC TO
-            </p>
-        }
-        @if (Stock.IndustrialClassification != null)
-        {
-            <p class="mb-4">
-                Industrial classification: @Stock.IndustrialClassification
-            </p>
-        }
-
-        @if (Stock.HomepageUrl != null)
-        {
-            <p class="mb-4">
-                <link rel="stylesheet" href=@Stock.HomepageUrl>
-            </p>
-        }
-        @if (Stock.PrimaryExchange != null)
-        {
-            <p class="mb-4">
-                Primary exchange: @Stock.PrimaryExchange
-            </p>
-        }
-    </div>
-    <div class="container">
         <div class="row">
-            <div class="col-12 col-md-2">
-                <form>
-                    <button class="btn btn-info" type="button">current day</button>
-                </form>
+            <div class="col-md-6 mb-4">
+                @if (Stock.HomepageUrl != null)
+                {
+                    <div class="mb-4">
+                        <h4>Homepage</h4>
+                        <a rel="stylesheet" href=@Stock.HomepageUrl target="_blank">@Stock.HomepageUrl</a>
+                    </div>
+                }
+
+                @if (Stock.IndustrialClassification != null)
+                {
+                    <div class="mb-4">
+                        <h4>Industrial classification</h4>
+                        @Stock.IndustrialClassification
+                    </div>
+                }
             </div>
-            <div class="col-12 col-md-2">
-                <form>
-                    <button class="btn btn-info" type="button">1 week ago</button>
-                </form>
-            </div>
-            <div class="col-12 col-md-2">
-                <form>
-                    <button class="btn btn-info" type="button">1 month ago</button>
-                </form>
-            </div>
-            <div class="col-12 col-md-2">
-                <form>
-                    <button class="btn btn-info" type="button">3 months ago</button>
-                </form>
+            <div class="col-md-6 mb-4">
+                @if (Stock.ListDate != null)
+                {
+                    <div class="mb-4">
+                        <h4>Created</h4>
+                        @DateOnly.FromDateTime(Stock.ListDate.Value)
+                    </div>
+                }
+                @if (Stock.PrimaryExchange != null)
+                {
+                    <div class="mb-4">
+                        <h4>Primary exchange</h4>
+                        @Stock.PrimaryExchange
+                    </div>
+                }
             </div>
         </div>
-    </div>
-    <div >
-        @* <div><button  type="button" class="btn btn-info">current day</button></div> *@
-        @* <div><button  type="button" class="btn btn-info">1 week ago</button></div> *@
-        @* <div><button  type="button" class="btn btn-info">1 month ago</button></div> *@
-        @* <div><button  type="button" class="btn btn-info">3 months ago</button></div> *@
 
+    <div>
+        <Chart Ticker="@Stock.TickerSymbol"></Chart>
     </div>
 }

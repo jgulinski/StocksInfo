@@ -1,5 +1,7 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
+using Shared.Models.Aggregates;
 
 namespace Server.Controllers;
 
@@ -18,21 +20,39 @@ public class StocksController : ControllerBase
     [Route("{ticker}")]
     public async Task<IActionResult> GetStockInfo(string ticker)
     {
-        var stockInfo = await _stockService.GetStockAsync(ticker);
-
-        if (stockInfo == null)
+        var response = await _stockService.GetStockAsync(ticker);
+        
+        if (response.StatusCode != HttpStatusCode.OK)
         {
-            return NotFound();
+            return StatusCode((int) response.StatusCode, response.Content);
         }
-        return Ok(stockInfo);
+        return Ok(response.Content);
     }
 
     [HttpGet]
     [Route("Search/{searchText}")]
     public async Task<IActionResult> GetStockSearchResult(string searchText)
     {
-        var stocks = await _stockService.GetStocksSearchResultAsync(searchText);
-        return Ok(stocks);
+        var response = await _stockService.GetStocksSearchResultAsync(searchText);
+        
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return StatusCode((int) response.StatusCode, response.Content);
+        }
+        return Ok(response.Content);
+    }
+
+    [HttpGet]
+    [Route("{ticker}/Aggregates")]
+    public async Task<IActionResult> GetStockAggregates(string ticker)
+    {
+        var response = await _stockService.GetAggregatesAsync(ticker);
+        
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return StatusCode((int) response.StatusCode, response.Content);
+        }
+        return Ok(response.Content);
     }
     
 }

@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Shared.Models;
+using Shared.Models.Aggregates;
 
 namespace Client.Services;
 
@@ -16,17 +17,15 @@ public class StockService : IStockService
     {
         try
         {
-            // var response = await _httpClient.GetFromJsonAsync<StockInfo>($"api/StockInfo/{ticker}");
-
             var response = await _httpClient.GetAsync($"api/stocks/{ticker}");
-
-
+            
             if (response.IsSuccessStatusCode)
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                 {
                     return default(Stock);
                 }
+
                 return await response.Content.ReadFromJsonAsync<Stock>();
             }
             else
@@ -46,4 +45,10 @@ public class StockService : IStockService
     {
         return await _httpClient.GetFromJsonAsync<List<FoundStockDto>>($"api/stocks/search/{searchText}");
     }
+
+    public async Task<List<Aggregate>> GetStockAggregates(string ticker)
+    {
+        return await _httpClient.GetFromJsonAsync<List<Aggregate>>($"api/stocks/{ticker}/aggregates");
+    }
+    
 }

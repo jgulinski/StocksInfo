@@ -1,10 +1,11 @@
 using Client.Services;
 using Microsoft.AspNetCore.Components;
 using Shared.Models;
+using Shared.Models.Aggregates;
 
 namespace Client.Shared;
 
-public class StocksBase : ComponentBase
+public class ChartBase : ComponentBase
 {
     [Parameter]
     public string Ticker { get; set; }
@@ -12,14 +13,14 @@ public class StocksBase : ComponentBase
     [Inject]
     public IStockService StockService { get; set; }
 
-    protected Stock? Stock { get; set; }
+    protected List<Aggregate>? Aggregates { get; set; }
 
     protected string? ErrorMessage { get; set; }
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Stock = await StockService.GetStockInfo(Ticker);
+            Aggregates = await StockService.GetStockAggregates(Ticker);
         }
         catch (Exception e)
         {
