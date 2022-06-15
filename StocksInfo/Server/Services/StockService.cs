@@ -26,13 +26,24 @@ public class StockService : IStockService
     {
         ticker = ticker.ToUpper();
         var stock = await _context.Stocks.SingleOrDefaultAsync(e => e.TickerSymbol == ticker);
+        StockDto stockDto;
 
         if (stock != null)
         {
+            stockDto = new StockDto()
+            {
+                Description = stock.Description,
+                HomepageUrl = stock.HomepageUrl,
+                ImgUrl = stock.ImgUrl,
+                IndustrialClassification = stock.IndustrialClassification,
+                ListDate = stock.ListDate,
+                PrimaryExchange = stock.PrimaryExchange,
+                TickerSymbol = stock.TickerSymbol
+            };
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = stock
+                Content = stockDto
             };
         }
 
@@ -47,32 +58,32 @@ public class StockService : IStockService
 
             stock = new Stock()
             {
-                TickerSymbol = stockInfoDto.results.ticker,
-                Name = stockInfoDto.results.name,
-                PrimaryExchange = stockInfoDto.results.primary_exchange,
-                Description = stockInfoDto.results.description,
-                IndustrialClassification = stockInfoDto.results.sic_description,
-                HomepageUrl = stockInfoDto.results.homepage_url,
+                TickerSymbol = stockInfoDto.Results.Ticker,
+                Name = stockInfoDto.Results.Name,
+                PrimaryExchange = stockInfoDto.Results.PrimaryExchange,
+                Description = stockInfoDto.Results.Description,
+                IndustrialClassification = stockInfoDto.Results.IndustrialClassification,
+                HomepageUrl = stockInfoDto.Results.HomepageUrl,
             };
 
-            if (stockInfoDto.results.list_date != null)
+            if (stockInfoDto.Results.ListDate != null)
             {
-                stock.ListDate = DateTime.Parse(stockInfoDto.results.list_date);
+                stock.ListDate = DateTime.Parse(stockInfoDto.Results.ListDate);
             }
-            if (stockInfoDto.results.branding != null)
+            if (stockInfoDto.Results.Branding != null)
             {
-                if (stockInfoDto.results.branding.logo_url != null)
+                if (stockInfoDto.Results.Branding.LogoUrl != null)
                 {
-                    stock.ImgUrl = stockInfoDto.results.branding.logo_url;
+                    stock.ImgUrl = stockInfoDto.Results.Branding.LogoUrl;
                 }
                 else
                 {
-                    stock.ImgUrl = stockInfoDto.results.branding.icon_url;
+                    stock.ImgUrl = stockInfoDto.Results.Branding.IconUrl;
                 }
 
                 stock.ImgUrl += $"?apiKey={_configuration["apiKey"]}";
             }
-
+            
             await _context.Stocks.AddAsync(stock);
             await _context.SaveChangesAsync();
         }
@@ -92,11 +103,23 @@ public class StockService : IStockService
                 Content = message
             };
         }
+        
+        stockDto = new StockDto()
+        {
+            TickerSymbol = stock.TickerSymbol,
+            Name = stock.Name,
+            PrimaryExchange = stock.PrimaryExchange,
+            Description = stock.Description,
+            IndustrialClassification = stock.IndustrialClassification,
+            HomepageUrl = stock.HomepageUrl,
+            ListDate = stock.ListDate,
+            ImgUrl = stock.ImgUrl
+        };
 
         return new StatusResponse()
         {
             StatusCode = HttpStatusCode.OK,
-            Content = stock
+            Content = stockDto
         };
     }
 
@@ -104,6 +127,7 @@ public class StockService : IStockService
     {
         var url = "https://api.polygon.io/v3/reference/tickers?ticker.gte=" + token.ToUpper() +
                   $"&active=true&sort=ticker&order=asc&limit=5&apiKey={_configuration["apiKey"]}";
+
 
         var response = await _httpClient.GetAsync(url);
 
@@ -114,13 +138,13 @@ public class StockService : IStockService
             var stocksFound = new List<FoundStockDto>();
 
 
-            foreach (var stock in stockSearchResult.results)
+            foreach (var stock in stockSearchResult.Results)
             {
                 stocksFound.Add(new FoundStockDto()
                 {
-                    TickerSymbol = stock.ticker,
-                    Name = stock.name,
-                    PrimaryExchange = stock.primary_exchange,
+                    TickerSymbol = stock.Ticker,
+                    Name = stock.Name,
+                    PrimaryExchange = stock.PrimaryExchange,
                 });
             }
 
@@ -150,6 +174,8 @@ public class StockService : IStockService
     {
         var toDate = DateTime.Today.AddDays(-1);
         var fromDate = DateTime.Today.AddDays(-121);
+
+        var aggregateDtos = new List<AggregateDto>();
 
         var aggregates = await _context
             .Aggregates.Where(e => e.TickerSymbol == ticker &&  e.Date > fromDate).ToListAsync();
@@ -184,20 +210,35 @@ public class StockService : IStockService
             if (stockSearchResult.resultsCount != 0)
             {
                 newAggregates = stockSearchResult.results.ConvertAll(e => new Aggregate()
-                    {
-                        TickerSymbol = ticker,
-                        Date = DateTimeOffset.FromUnixTimeMilliseconds(e.t).UtcDateTime,
-                        Open = e.o,
-                        Close = e.c,
-                        High = e.h,
-                        Low = e.l,
-                        NumberOfTransactions = e.n,
-                        // Volume = e.v,
-                        AveragePrice = e.vw
-                    }
+                {
+                    TickerSymbol = ticker,
+                    Date = DateTimeOffset.FromUnixTimeMilliseconds(e.Time).UtcDateTime,
+                    Open = e.Open,
+                    Close = e.Close,
+                    High = e.High,
+                    Low = e.Low,
+                    NumberOfTransactions = e.NumberOfTransactions,
+                    Volume = e.Volume,
+                    AveragePrice = e.AveragePrice
+                }
                 ).ToList();
                 await _context.Aggregates.AddRangeAsync(newAggregates);
                 await _context.SaveChangesAsync();
+            }
+            foreach (var aggregate in aggregates.Concat(newAggregates))
+            {
+                aggregateDtos.Add( new ()
+                {
+                    AveragePrice = aggregate.AveragePrice,
+                    Close = aggregate.Close,
+                    Date = aggregate.Date,
+                    High = aggregate.High,
+                    Low = aggregate.Low,
+                    NumberOfTransactions = aggregate.NumberOfTransactions,
+                    Open = aggregate.Open,
+                    Volume = aggregate.Volume,
+                    TickerSymbol = aggregate.TickerSymbol
+                });
             }
             
             return new StatusResponse()
@@ -205,6 +246,21 @@ public class StockService : IStockService
                 StatusCode = HttpStatusCode.OK,
                 Content = aggregates.Concat(newAggregates).ToList()
             };
+        }
+        
+        foreach (var aggregate in aggregates)
+        {
+            aggregateDtos.Add( new ()
+            {
+                AveragePrice = aggregate.AveragePrice,
+                Close = aggregate.Close,
+                Date = aggregate.Date,
+                High = aggregate.High,
+                Low = aggregate.Low,
+                NumberOfTransactions = aggregate.NumberOfTransactions,
+                Open = aggregate.Open,
+                TickerSymbol = aggregate.TickerSymbol
+            });
         }
 
         if (aggregates.Count != 0)

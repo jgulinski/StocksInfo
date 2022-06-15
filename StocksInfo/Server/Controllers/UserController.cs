@@ -11,10 +11,12 @@ namespace Server.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IWatchlistService _watchlistService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IWatchlistService watchlistService)
     {
         _userService = userService;
+        _watchlistService = watchlistService;
     }
 
     [Route("register")]
@@ -43,5 +45,47 @@ public class UserController : ControllerBase
             return StatusCode((int) response.StatusCode, response.Content);
         }
         return Ok(response.Content);
+    }
+
+    [HttpGet]
+    [Route("{username}/watchList")]
+    public async Task<IActionResult> GetWatchlist(string username)
+    {
+        var response = await _watchlistService.GetWatchlistAsync(username);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return StatusCode((int) response.StatusCode, response.Content);
+        }
+
+        return Ok(response.Content);
+    }
+    
+    [HttpPost]
+    [Route("{username}/watchlist/{ticker}")]
+    public async Task<IActionResult> AddToWatchlist(string username, string ticker)
+    {
+        var response = await _watchlistService.AddToWatchlistAsync(username, ticker);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return StatusCode((int) response.StatusCode, response.Content);
+        }
+
+        return Ok();
+    }
+
+    [HttpDelete]
+    [Route("{username}/watchlist/{ticker}")]
+    public async Task<IActionResult> DeleteFromWatchlist(string username, string ticker)
+    {
+        var response = await _watchlistService.DeleteFromWatchlistAsync(username, ticker);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return StatusCode((int) response.StatusCode, response.Content);
+        }
+
+        return Ok();
     }
 }

@@ -53,6 +53,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 builder.Services.AddTransient<IStockService, StockService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IWatchlistService, WatchlistService>();
 builder.Services.AddHttpClient();
 
 

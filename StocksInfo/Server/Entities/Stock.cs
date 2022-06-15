@@ -13,13 +13,13 @@ public class Stock
     public DateTime? ListDate { get; set; }
     public string? ImgUrl { get; set; }
 
-    public ICollection<Aggregate> Aggregates { get; set; }
+    public virtual ICollection<Aggregate> Aggregates { get; set; }
 
-    public virtual ICollection<User> Users { get; set; }
+    public virtual ICollection<Watchlist> Watchlists { get; set; }
 
     public Stock()
     {
-        Users = new HashSet<User>();
         Aggregates = new HashSet<Aggregate>();
+        Watchlists = new HashSet<Watchlist>();
     }
 }

@@ -1,13 +1,10 @@
-@page "/chart/{Ticker}"
-@using global::Shared.Models.Aggregates
 @inherits ChartBase
-@inject IIgniteUIBlazor IgniteUIBlazor
+@using global::Shared.Models.Aggregates
+@inject IIgniteUIBlazor _igniteUiBlazor
 
 @if (Aggregates == null && ErrorMessage == null)
 {
-    <div class="spinner">
-        <SfSpinner Visible="true"></SfSpinner>
-    </div>
+    <p>Loading...</p>
 }
 else if (ErrorMessage != null)
 {
@@ -22,9 +19,9 @@ else
                                ChartType=FinancialChartType.Candle
                                Thickness=2
                                DataSource="Aggregates"
-
                                ZoomSliderType="FinancialChartZoomSliderType.None"
-                               YAxisMode="FinancialChartYAxisMode.Numeric"/>
+                               YAxisMode="FinancialChartYAxisMode.Numeric"
+                               />
         </div>
     </div>
 }

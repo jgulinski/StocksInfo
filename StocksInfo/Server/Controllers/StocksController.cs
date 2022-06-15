@@ -7,7 +7,7 @@ namespace Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+// [Authorize]
 public class StocksController : ControllerBase
 {
     private readonly IStockService _stockService;

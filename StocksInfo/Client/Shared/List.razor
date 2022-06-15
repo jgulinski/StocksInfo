@@ -1,0 +1,74 @@
+@using IgniteUI.Blazor.Controls
+@using Client.Services
+@inject IIgniteUIBlazor _igniteUiBlazor
+@inherits ListBase
+@inject HttpClient _httpClient
+
+@if (Watchlist == null || Watchlist.Count == 0)
+{
+    <h3>No stocks added to the watchlist!</h3>
+}
+else
+{
+    <div class="container">
+        <h3 class="p-3 text-center">Blazor WebAssembly - Display a list of items</h3>
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Ticker</th>
+                <th>Name</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Watchlist)
+            {
+                <tr>
+                    <td>
+                        <div class="col-md-4 mb-4 d-flex align-items-center justify-content-center ">
+                            <img height="30" src="@item.ImgUrl" alt="">
+                        </div>
+                    </td>
+                    <td>@item.TickerSymbol</td>
+                    <td>@item.Name</td>
+                    <td>@item.PrimaryExchange</td>
+                    <td>
+                        <div class="col-md-12 text-center">
+                            <a class="btn btn-primary" href="/stocks/@item.TickerSymbol">Details</a>
+                            <a class="btn btn-danger" @onclick="() => DeleteFromWatchList(item.TickerSymbol)">Delete</a>
+
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <Confirm @ref="DeleteConfirmation" ConfirmationChanged="ConfirmDeleteClick"></Confirm>
+}
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        IgbDataGridModule.Register(_igniteUiBlazor);
+        IgbButtonModule.Register(_igniteUiBlazor);
+    }
+
+    private void DeleteFromWatchList(string ticker)
+    {
+        TickerSymbol = ticker;
+        DeleteConfirmation.Show(ticker);
+    }
+
+    private async Task ConfirmDeleteClick(bool deleteConfirmed)
+    {
+        if (deleteConfirmed)
+        {
+            await UserService.RemoveFromWatchlistAsync(Username, TickerSymbol);
+            Watchlist = await UserService.GetWatchlistAsync(Username);
+        }
+    }
+
+}

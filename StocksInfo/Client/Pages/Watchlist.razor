@@ -2,13 +2,19 @@
 @using Blazored.LocalStorage
 @using Microsoft.IdentityModel.JsonWebTokens
 
-@if (!isAuthenticated)
+@if (!_isAuthenticated)
 {
     <h1>You are not authorized to access this page</h1>
 }
+else if (Username == null)
+{
+    <p>"loading"</p>
+}
 else
 {
+    <List Username="@Username"/>
 }
+
 
 @code
 {
@@ -21,24 +27,23 @@ else
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
 
-    protected bool isAuthenticated = false;
+    private bool _isAuthenticated;
 
-    public string username { get; set; }
+    private string? Username { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationState).User;
         if (user.Identity.IsAuthenticated)
         {
-            isAuthenticated = true;
+            _isAuthenticated = true;
         }
         if (await _localStorageService.ContainKeyAsync("bearerToken"))
         {
             var savedToken = await _localStorageService.GetItemAsync<string>("bearerToken");
 
             var handler = new JsonWebTokenHandler();
-            username = handler.ReadJsonWebToken(savedToken).Subject;
+            Username = handler.ReadJsonWebToken(savedToken).Subject;
         }
     }
-
 }

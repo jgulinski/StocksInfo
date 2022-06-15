@@ -4,60 +4,64 @@
 
 @if (_registerSuccessful == false)
 {
-	<EditForm Model="_userToRegister" OnValidSubmit="RegisterUser">
-		<DataAnnotationsValidator />
+    <EditForm Model="_userToRegister" OnValidSubmit="RegisterUser">
+        <DataAnnotationsValidator/>
 
-		<div class="form-group my-3">
-			<label for="email">Email address</label>
-			<InputText @bind-Value="_userToRegister.EmailAddress" id="email" class="form-control" />
-			<ValidationMessage For="@(() => _userToRegister.EmailAddress)" />
-		</div>
+        <div class="form-group my-3">
+            <label for="email">Email address</label>
+            <InputText @bind-Value="_userToRegister.EmailAddress" id="email" class="form-control"/>
+            <ValidationMessage For="@(() => _userToRegister.EmailAddress)"/>
+        </div>
 
-		<div class="form-group my-3">
-			<label for="password">Password</label>
-			<InputText @bind-Value="_userToRegister.Password" type="password" id="password" class="form-control" />
-			<ValidationMessage For="@(() => _userToRegister.Password)" />
-		</div>
+        <div class="form-group my-3">
+            <label for="password">Password</label>
+            <InputText @bind-Value="_userToRegister.Password" type="password" id="password" class="form-control"/>
+            <ValidationMessage For="@(() => _userToRegister.Password)"/>
+        </div>
 
-		<ValidationSummary />
+        <ValidationSummary/>
 
-		<button type="submit" class="btn btn-primary btn-lg">Register</button>
+        <button type="submit" class="btn btn-primary btn-lg">Register</button>
 
-		@if (_attemptToRegisterFailed == true)
-		{
-			<p class="my-3 text-danger">@_attemptToRegisterFailedErrorMessage</p>
-		}
-	</EditForm>
+        @if (_attemptToRegisterFailed == true)
+        {
+            <p class="my-3 text-danger">@_attemptToRegisterFailedErrorMessage</p>
+        }
+    </EditForm>
 }
 else
 {
-	<h4>Register successful! Press the button below to go to the sign in page.</h4>
-	<a href="/signin" class="btn btn-primary btn-lg">Sign in</a>
+    <h4>Register successful! Press the button below to go to the sign in page.</h4>
+    <a href="/signin" class="btn btn-primary btn-lg">Sign in</a>
 }
 
 @code {
-	[Inject] HttpClient HttpClient { get; set; }
-	private readonly User _userToRegister = new() { EmailAddress = "user@example.com", Password = "Password1!" };
-	private bool _registerSuccessful = false;
-	private bool _attemptToRegisterFailed = false;
-	private string? _attemptToRegisterFailedErrorMessage = null;
 
-	private async Task RegisterUser()
-	{
-		_attemptToRegisterFailed = false;
+    [Inject]
+    HttpClient HttpClient { get; set; }
 
-		var httpResponseMessage = await HttpClient.PostAsJsonAsync(APIEndpoints.s_register, _userToRegister);
+    private readonly UserDto _userToRegister = new() {EmailAddress = "user@example.com", Password = "Password1!"};
+    private bool _registerSuccessful;
+    private bool _attemptToRegisterFailed;
+    private string? _attemptToRegisterFailedErrorMessage;
 
-		if (httpResponseMessage.IsSuccessStatusCode)
-		{
-			_registerSuccessful = true;
-		}
-		else
-		{
-			string serverErrorMessages = await httpResponseMessage.Content.ReadAsStringAsync();
+    private async Task RegisterUser()
+    {
+        _attemptToRegisterFailed = false;
 
-			_attemptToRegisterFailedErrorMessage = $"{serverErrorMessages} Please change your input and try again.";
-			_attemptToRegisterFailed = true;
-		}
-	}
+        var httpResponseMessage = await HttpClient.PostAsJsonAsync(APIEndpoints.s_register, _userToRegister);
+
+        if (httpResponseMessage.IsSuccessStatusCode)
+        {
+            _registerSuccessful = true;
+        }
+        else
+        {
+            string serverErrorMessages = await httpResponseMessage.Content.ReadAsStringAsync();
+
+            _attemptToRegisterFailedErrorMessage = $"{serverErrorMessages} Please change your input and try again.";
+            _attemptToRegisterFailed = true;
+        }
+    }
+
 }

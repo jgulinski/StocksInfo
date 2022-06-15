@@ -15,5 +15,9 @@ public class UserEfConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.Password).IsRequired().HasMaxLength(256);
 
         builder.ToTable("User");
+        
+        builder.HasMany(e => e.Watchlists)
+            .WithOne(a => a.IdUserNavigation)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

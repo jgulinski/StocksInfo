@@ -11,8 +11,8 @@ public class StocksBase : ComponentBase
 
     [Inject] public IStockService StockService { get; set; }
 
-    protected Stock? Stock = null;
-    protected bool isAuthenticated = false;
+    protected StockDto? Stock;
+    protected bool IsAuthenticated;
 
     protected string? ErrorMessage { get; set; }
     [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
@@ -24,8 +24,8 @@ public class StocksBase : ComponentBase
             var user = (await AuthenticationState).User;
             if (user.Identity.IsAuthenticated)
             {
-                isAuthenticated = true;
-                Stock = await StockService.GetStockInfo(Ticker);
+                IsAuthenticated = true;
+                Stock = await StockService.GetStockInfoAsync(Ticker);
             }
         }
         catch

@@ -12,6 +12,8 @@ public class ApiContext : DbContext
     public virtual DbSet<Stock> Stocks { get; set; }
     public virtual DbSet<Aggregate> Aggregates { get; set; }
     
+    public virtual DbSet<Watchlist> Watchlists { get; set; }
+    
     public ApiContext() {}
     
     public ApiContext(DbContextOptions<ApiContext> options) : base(options){}

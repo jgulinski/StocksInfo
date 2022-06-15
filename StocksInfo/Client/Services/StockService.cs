@@ -13,42 +13,58 @@ public class StockService : IStockService
         _httpClient = httpClient;
     }
 
-    public async Task<Stock?> GetStockInfo(string ticker)
+    public async Task<StockDto?> GetStockInfoAsync(string ticker)
     {
-        try
-        {
-            var response = await _httpClient.GetAsync($"api/stocks/{ticker}");
+        var response = await _httpClient.GetAsync($"api/stocks/{ticker}");
             
-            if (response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                {
-                    return default(Stock);
-                }
-
-                return await response.Content.ReadFromJsonAsync<Stock>();
-            }
-            else
-            {
-                var message = await response.Content.ReadAsStringAsync();
-                throw new Exception(message);
-            }
-        }
-
-        catch (Exception e)
+        if (response.IsSuccessStatusCode)
         {
-            throw;
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return default;
+            }
+
+            return await response.Content.ReadFromJsonAsync<StockDto>();
         }
+
+        var message = await response.Content.ReadAsStringAsync();
+        throw new Exception(message);
     }
 
-    public async Task<List<FoundStockDto>> SearchStocks(string searchText)
+    public async Task<List<FoundStockDto>> SearchStocksAsync(string searchText)
     {
-        return await _httpClient.GetFromJsonAsync<List<FoundStockDto>>($"api/stocks/search/{searchText}");
+        var response = await _httpClient.GetAsync($"api/stocks/search/{searchText}");
+            
+        if (response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return new List<FoundStockDto>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<FoundStockDto>>();
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        throw new Exception(message);
     }
 
-    public async Task<List<Aggregate>> GetStockAggregates(string ticker)
+    public async Task<List<AggregateDto>> GetStockAggregatesAsync(string ticker)
     {
-        return await _httpClient.GetFromJsonAsync<List<Aggregate>>($"api/stocks/{ticker}/aggregates");
+        var response = await _httpClient.GetAsync($"api/stocks/{ticker}/aggregates");
+            
+        if (response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return new List<AggregateDto>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<AggregateDto>>();
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        throw new Exception(message);
     }
     
 }

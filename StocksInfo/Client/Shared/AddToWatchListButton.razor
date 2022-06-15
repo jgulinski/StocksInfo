@@ -1,14 +1,18 @@
 @inject HttpClient _httpClient
 @using Blazored.LocalStorage
+@using Client.Services
 @using Microsoft.IdentityModel.JsonWebTokens
+@inject IUserService _userService
+@inject IJSRuntime _jsRuntime
 
 <a @onclick="@AddToWatchList" class="btn btn-primary">Add to watchlist</a>
 
 @code {
 
-    private void AddToWatchList()
+    private async void AddToWatchList()
     {
-        _httpClient.PostAsJsonAsync($"/user/{Username}/watchlist", Ticker);
+        await _userService.AddToWatchlist(Username, Ticker);
+
     }
 
     [Inject]
@@ -17,7 +21,7 @@
     [Inject]
     ILocalStorageService _localStorageService { get; set; }
 
-    public string Username { get; set; }
+    private string Username { get; set; }
 
     [Parameter]
     public string Ticker { get; set; }

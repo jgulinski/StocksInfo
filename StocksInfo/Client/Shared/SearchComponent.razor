@@ -25,7 +25,7 @@
 
     private async Task<IEnumerable<FoundStockDto>> SearchStock(string searchText)
     {
-        var response = await _stockService.SearchStocks(searchText);
+        var response = await _stockService.SearchStocksAsync(searchText);
         return response;
     }
 

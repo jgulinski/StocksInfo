@@ -22,6 +22,10 @@ public class StockEfConfiguration : IEntityTypeConfiguration<Stock>
         builder.HasMany(e => e.Aggregates)
             .WithOne(a => a.IdStockNavigation)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(e => e.Watchlists)
+            .WithOne(a => a.IdStockNavigation)
+            .OnDelete(DeleteBehavior.Cascade);
 
     }
 }

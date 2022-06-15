@@ -3,27 +3,34 @@
 @inject HttpClient _httpClient
 
 
-@if (!isAuthenticated)
+@if (!IsAuthenticated)
 {
     <h1>You are not authorized to access this page</h1>
 }
 else
 {
-@if (Stock == null && ErrorMessage == null)
+@if (Stock == null)
 {
-    <p>Loading...</p>
+    if (ErrorMessage != null)
+    {
+        <DisplayError ErrorMessage="@ErrorMessage"></DisplayError>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
 }
-else if (ErrorMessage != null)
-{
-    <DisplayError ErrorMessage="@ErrorMessage"></DisplayError>
-}
+
 else
 {
+    <div class="alert alert-primary" role="alert">
+        This is a primary alert—check it out!
+    </div>
+
     <div class="row">
         <h3 class="col-10 mb-5">Dashboard</h3>
         <div class="col-2">
             <AddToWatchListButton Ticker=@Stock.TickerSymbol></AddToWatchListButton>
-
         </div>
     </div>
 
@@ -31,7 +38,7 @@ else
         @if (Stock.ImgUrl != null)
         {
             <div class="col-md-4 mb-4 d-flex align-items-center justify-content-center ">
-                    <img width="250" src="@Stock.ImgUrl">
+                <img width="250" src="@Stock.ImgUrl" alt="">
             </div>
         }
         <div class="col-md-8 mb-4">

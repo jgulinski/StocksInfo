@@ -26,7 +26,7 @@
 
         <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
 
-        @if (_attemptToSignInFailed == true)
+        @if (_attemptToSignInFailed)
         {
             <p class="my-3 text-danger">Sing in failed. Please check your username/password and try again</p>
         }
@@ -48,9 +48,9 @@ else
     [Inject]
     AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
-    private readonly User _userToSignIn = new();
-    private bool _signInSuccessful = false;
-    private bool _attemptToSignInFailed = false;
+    private readonly UserDto _userToSignIn = new();
+    private bool _signInSuccessful;
+    private bool _attemptToSignInFailed;
 
     private async Task SignInUser()
     {

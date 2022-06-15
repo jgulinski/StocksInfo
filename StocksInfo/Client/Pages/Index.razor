@@ -6,38 +6,38 @@
 @inject HttpClient _httpClient
 
 
-@if (!isAuthenticated)
+@if (!_isAuthenticated)
 {
     <div class="h-100 d-flex align-items-center justify-content-center">
-        <h3>Welcome to Stock info app. Please sign in</h3>@username
+        <h3>Welcome to Stock info app. Please sign in</h3>@Username
     </div>
 }
 else
 {
-    <h1>Welcome @username</h1>
+    <h1>Welcome @Username</h1>
 }
 
 @code
 {
     [Inject]
-    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    AuthenticationStateProvider? AuthenticationStateProvider { get; set; }
 
     [Inject]
-    ILocalStorageService _localStorageService { get; set; }
+    ILocalStorageService? LocalStorageService { get; set; }
 
-    bool isAuthenticated = false;
+    bool _isAuthenticated;
 
-    public string username { get; set; }
+    private string? Username { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (await _localStorageService.ContainKeyAsync("bearerToken"))
+        if (LocalStorageService != null && await LocalStorageService.ContainKeyAsync("bearerToken"))
         {
-            isAuthenticated = true;
-            string savedToken = await _localStorageService.GetItemAsync<string>("bearerToken");
+            _isAuthenticated = true;
+            var savedToken = await LocalStorageService.GetItemAsync<string>("bearerToken");
 
             var handler = new JsonWebTokenHandler();
-            username = handler.ReadJsonWebToken(savedToken).Subject;
+            Username = handler.ReadJsonWebToken(savedToken).Subject;
 
             await ((AppAuthenticationStateProvider) AuthenticationStateProvider).SignIn();
 

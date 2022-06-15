@@ -1,26 +1,30 @@
+using System.Text.Json.Serialization;
+
 namespace Shared.Models;
 
+// json property name 
 public class StockJsonModel
 {
-    public Content results { get; set; }
-    public string status { get; set; }
-    public string? error { get; set; }
+    public Content Results { get; set; }
+    public string Status { get; set; }
+    public string? Error { get; set; }
 }
 
 public class Branding
 {
-    public string? logo_url { get; set; }
-    public string? icon_url { get; set; }
+    [JsonPropertyName("logo_url")] public string? LogoUrl { get; set; }
+    [JsonPropertyName("icon_url")] public string? IconUrl { get; set; }
 }
 
 public class Content
 {
-    public string ticker { get; set; }
-    public string name { get; set; }
-    public string? primary_exchange { get; set; }
-    public string? description { get; set; }
-    public string? sic_description { get; set; }
-    public string? homepage_url { get; set; }
-    public string? list_date { get; set; }
-    public Branding? branding { get; set; }
+    public string Ticker { get; set; }
+    public string Name { get; set; }
+
+    [JsonPropertyName("primary_exchange")] public string? PrimaryExchange { get; set; }
+    public string? Description { get; set; }
+    [JsonPropertyName("sic_description")] public string? IndustrialClassification { get; set; }
+    [JsonPropertyName("homepage_url")]public string? HomepageUrl { get; set; }
+    [JsonPropertyName("list_date")] public string? ListDate { get; set; }
+    public Branding? Branding { get; set; }
 }

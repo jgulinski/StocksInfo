@@ -5,7 +5,7 @@ namespace Client.Services;
 
 public interface IStockService
 {
-    Task<Stock?> GetStockInfo(string ticker);
-    Task<List<FoundStockDto>> SearchStocks(string searchText);
-    Task<List<Aggregate>> GetStockAggregates(string ticker);
+    Task<StockDto?> GetStockInfoAsync(string ticker);
+    Task<List<FoundStockDto>> SearchStocksAsync(string searchText);
+    Task<List<AggregateDto>> GetStockAggregatesAsync(string ticker);
 }
