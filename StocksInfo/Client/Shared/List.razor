@@ -4,14 +4,18 @@
 @inherits ListBase
 @inject HttpClient _httpClient
 
-@if (Watchlist == null || Watchlist.Count == 0)
+@if (@Watchlist == null)
+{
+    <p>Loading...</p>
+}
+else if (Watchlist.Count == 0)
 {
     <h3>No stocks added to the watchlist!</h3>
 }
 else
 {
     <div class="container">
-        <h3 class="p-3 text-center">Blazor WebAssembly - Display a list of items</h3>
+        <h2 class="p-3 text-center">Watchlist</h2>
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
@@ -26,8 +30,9 @@ else
             {
                 <tr>
                     <td>
-                        <div class="col-md-4 mb-4 d-flex align-items-center justify-content-center ">
-                            <img height="30" src="@item.ImgUrl" alt="">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <img src="@item.ImgUrl" alt=""
+                                 style="max-width:200px; max-height:120px; width: auto; height: auto">
                         </div>
                     </td>
                     <td>@item.TickerSymbol</td>
