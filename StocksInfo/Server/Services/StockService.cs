@@ -32,12 +32,13 @@ public class StockService : IStockService
         {
             stockDto = new StockDto()
             {
+                Name = stock.Name,
                 Description = stock.Description,
                 HomepageUrl = stock.HomepageUrl,
                 ImgUrl = stock.ImgUrl,
                 IndustrialClassification = stock.IndustrialClassification,
                 ListDate = stock.ListDate,
-                PrimaryExchange = stock.PrimaryExchange,
+                MarketIdentifier = stock.MarketIdentifier,
                 TickerSymbol = stock.TickerSymbol
             };
             return new StatusResponse()
@@ -60,7 +61,7 @@ public class StockService : IStockService
             {
                 TickerSymbol = stockInfoDto.Results.Ticker,
                 Name = stockInfoDto.Results.Name,
-                PrimaryExchange = stockInfoDto.Results.PrimaryExchange,
+                MarketIdentifier = stockInfoDto.Results.MarketIdentifier,
                 Description = stockInfoDto.Results.Description,
                 IndustrialClassification = stockInfoDto.Results.IndustrialClassification,
                 HomepageUrl = stockInfoDto.Results.HomepageUrl,
@@ -108,7 +109,7 @@ public class StockService : IStockService
         {
             TickerSymbol = stock.TickerSymbol,
             Name = stock.Name,
-            PrimaryExchange = stock.PrimaryExchange,
+            MarketIdentifier = stock.MarketIdentifier,
             Description = stock.Description,
             IndustrialClassification = stock.IndustrialClassification,
             HomepageUrl = stock.HomepageUrl,

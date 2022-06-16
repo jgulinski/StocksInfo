@@ -6,7 +6,7 @@
 
 @if (@Watchlist == null)
 {
-    <p>Loading...</p>
+    <Spinner/>
 }
 else if (Watchlist.Count == 0)
 {
@@ -16,12 +16,12 @@ else
 {
     <div class="container">
         <h2 class="p-3 text-center">Watchlist</h2>
-        <table class="table table-striped table-bordered">
+        <table class="table table-striped table-bordered table table-responsive">
             <thead>
             <tr>
                 <th></th>
-                <th>Ticker</th>
-                <th>Name</th>
+                <th class="align-middle text-center">Ticker</th>
+                <th class="align-middle text-center">Name</th>
                 <th></th>
             </tr>
             </thead>
@@ -35,14 +35,19 @@ else
                                  style="max-width:200px; max-height:120px; width: auto; height: auto">
                         </div>
                     </td>
-                    <td>@item.TickerSymbol</td>
-                    <td>@item.Name</td>
-                    <td>@item.PrimaryExchange</td>
-                    <td>
+                    <td class="align-middle text-center">
+                        @item.TickerSymbol
+                    </td>
+                    <td class="align-middle text-center">
+                        @item.Name
+                    </td>
+                    <td class="align-middle text-center">
+                        @item.MarketIdentifier
+                    </td>
+                    <td class="align-middle">
                         <div class="col-md-12 text-center">
                             <a class="btn btn-primary" href="/stocks/@item.TickerSymbol">Details</a>
                             <a class="btn btn-danger" @onclick="() => DeleteFromWatchList(item.TickerSymbol)">Delete</a>
-
                         </div>
                     </td>
                 </tr>

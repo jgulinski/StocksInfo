@@ -6,7 +6,7 @@ public class Stock
 {
     public string TickerSymbol { get; set; }
     public string Name { get; set; }
-    public string? PrimaryExchange { get; set; }
+    public string? MarketIdentifier { get; set; }
     public string? Description { get; set; }
     public string? IndustrialClassification { get; set; }
     public string? HomepageUrl { get; set; }

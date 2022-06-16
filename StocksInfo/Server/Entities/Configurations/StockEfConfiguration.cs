@@ -12,7 +12,7 @@ public class StockEfConfiguration : IEntityTypeConfiguration<Stock>
 
         builder.Property(e => e.TickerSymbol).IsRequired().HasMaxLength(10);
         builder.Property(e => e.Name).IsRequired().HasMaxLength(100);
-        builder.Property(e => e.PrimaryExchange).HasMaxLength(50);
+        builder.Property(e => e.MarketIdentifier).HasMaxLength(50);
         builder.Property(e => e.IndustrialClassification).HasMaxLength(100);
         builder.Property(e => e.HomepageUrl).HasMaxLength(400);
         builder.Property(e => e.ImgUrl).HasMaxLength(400);

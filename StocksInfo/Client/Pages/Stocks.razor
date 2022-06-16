@@ -17,21 +17,26 @@ else
     }
     else
     {
-        <p>Loading...</p>
+        <Spinner/>
     }
 }
 
 else
 {
-    <div class="alert alert-primary" role="alert">
-        This is a primary alert—check it out!
-    </div>
-
     <div class="row">
-        <h3 class="col-10 mb-5">Dashboard</h3>
-        <div class="col-2">
-            <AddToWatchListButton Ticker=@Stock.TickerSymbol></AddToWatchListButton>
-        </div>
+        <h3 class="col-10 mb-5">Stock</h3>
+        @if (Watchlist.SingleOrDefault(e => e.TickerSymbol == Ticker) == null)
+        {
+            <div class="col-2">
+                <button @onclick="@AddToWatchList" class="btn btn-primary">Add to watchlist</button>
+            </div>
+        }
+        else
+        {
+            <div class="col-2">
+                <button @onclick="@AddToWatchList" class="btn btn-primary" disabled>Add to watchlist</button>
+            </div>
+        }
     </div>
 
     <div class="row me-4">
@@ -40,18 +45,28 @@ else
             <div class="col-md-4 mb-4 d-flex align-items-center justify-content-center">
                 <img width="250" src="@Stock.ImgUrl" alt="">
             </div>
-        }
-        <div class="col-md-8 mb-4">
-            <h3>@Stock.Name</h3>
-            <p class="mb-4">@Stock.Description</p>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
+            <div class="col-md-8 mb-4">
+                <h3>@Stock.Name</h3>
+                <div>
+                    <p>@Stock.Description</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-4 mb-4">
+                <h3>@Stock.Name</h3>
+                <div>
+                    <p>@Stock.Description</p>
+                </div>
+            </div>
+        }
+
+        <div class="row mt-5">
             @if (Stock.HomepageUrl != null)
             {
-                <div class="mb-4">
+                <div class="col-md-6 mb-5">
                     <h4>Homepage</h4>
                     <a rel="stylesheet" href=@Stock.HomepageUrl target="_blank">@Stock.HomepageUrl</a>
                 </div>
@@ -59,32 +74,39 @@ else
 
             @if (Stock.IndustrialClassification != null)
             {
-                <div class="mb-4">
+                <div class="col-md-6 mb-5">
                     <h4>Industrial classification</h4>
                     @Stock.IndustrialClassification
                 </div>
             }
-        </div>
-        <div class="col-md-6 mb-4">
             @if (Stock.ListDate != null)
             {
-                <div class="mb-4">
+                <div class="col-md-6 mb-5">
                     <h4>Created</h4>
                     @DateOnly.FromDateTime(Stock.ListDate.Value)
                 </div>
             }
-            @if (Stock.PrimaryExchange != null)
+            @if (Stock.MarketIdentifier != null)
             {
-                <div class="mb-4">
+                <div class="col-md-6 mb-5">
                     <h4>Primary exchange</h4>
-                    @Stock.PrimaryExchange
+                    @Stock.MarketIdentifier
                 </div>
             }
         </div>
+
     </div>
 
     <div>
         <Chart Ticker="@Stock.TickerSymbol"></Chart>
     </div>
 }
-}
+@code
+{
+    private async void AddToWatchList()
+    {
+        await UserService.AddToWatchlist(Username, Ticker);
+        Watchlist = await UserService.GetWatchlistAsync(Username);
+        StateHasChanged();
+    }
+}}

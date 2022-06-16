@@ -21,7 +21,7 @@ public class Content
     public string Ticker { get; set; }
     public string Name { get; set; }
 
-    [JsonPropertyName("primary_exchange")] public string? PrimaryExchange { get; set; }
+    [JsonPropertyName("primary_exchange")] public string? MarketIdentifier { get; set; }
     public string? Description { get; set; }
     [JsonPropertyName("sic_description")] public string? IndustrialClassification { get; set; }
     [JsonPropertyName("homepage_url")]public string? HomepageUrl { get; set; }

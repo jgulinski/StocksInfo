@@ -30,7 +30,7 @@ public class WatchlistService : IWatchlistService
                 TickerSymbol = stock.TickerSymbol,
                 ImgUrl = stock.ImgUrl,
                 Name = stock.Name,
-                PrimaryExchange = stock.PrimaryExchange
+                MarketIdentifier = stock.MarketIdentifier
             };
             if (watchListDto.ImgUrl != null)
             {
