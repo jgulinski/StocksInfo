@@ -10,7 +10,8 @@
 * .NET 6
 * EF Core 6
 * Blazor
-* HTML, CSS
+* HTML5
+* CSS3
 * SQL Server
 
 ## Future Plans
