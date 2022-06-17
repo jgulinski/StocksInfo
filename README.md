@@ -7,9 +7,9 @@
 
 ## Used Technologies
 * C#
-* .NET Core
-* EF Core
-* Blazor WebAssembly
+* .NET 6
+* EF Core 6
+* Blazor
 * HTML, CSS
 * SQL Server
 
