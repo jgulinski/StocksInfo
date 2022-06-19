@@ -28,7 +28,7 @@ public class UserService : IUserService
         if (userWithGivenEmail != null)
         {
             return new StatusResponse()
-                {StatusCode = HttpStatusCode.BadRequest, Content = "User with given email already exists"};
+                {StatusCode = HttpStatusCode.BadRequest, Message = "User with given email already exists"};
         }
 
         string hashedPassword = new PasswordHasher<User>()
@@ -53,7 +53,7 @@ public class UserService : IUserService
         if (userFromDb == null)
         {
             return new StatusResponse()
-                {StatusCode = HttpStatusCode.BadRequest, Content = "User with given email not found"};
+                {StatusCode = HttpStatusCode.BadRequest, Message = "User with given email not found"};
         }
 
         PasswordVerificationResult verifiedPassword = new PasswordHasher<User>()
@@ -61,16 +61,16 @@ public class UserService : IUserService
 
         if (verifiedPassword == PasswordVerificationResult.Failed)
         {
-            return new StatusResponse() {StatusCode = HttpStatusCode.BadRequest, Content = "Wrong password"};
+            return new StatusResponse() {StatusCode = HttpStatusCode.BadRequest, Message = "Wrong password"};
         }
-        var token = await GenerateToken(userFromDb);
+        var token = GenerateToken(userFromDb);
         
         return new StatusResponse()
         {
-            StatusCode = HttpStatusCode.OK, Content = token
+            StatusCode = HttpStatusCode.OK, Message = token
         };
     }
-  private async Task<string> GenerateToken(User user)
+  private string GenerateToken(User user)
   {
       var token = AuthHelper.GenerateToken(user, _configuration["Jwt:Issuer"], _configuration["Jwt:Key"]);
         return new JwtSecurityTokenHandler().WriteToken(token);

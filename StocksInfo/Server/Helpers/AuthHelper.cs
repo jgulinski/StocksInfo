@@ -6,7 +6,7 @@ using Shared.Models;
 
 namespace Server.Helpers;
 
-public class AuthHelper
+public static class AuthHelper
 {
     public static JwtSecurityToken GenerateToken(User user, string issuer, string key)
     {

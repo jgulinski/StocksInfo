@@ -22,8 +22,9 @@ public class WatchlistService : IWatchlistService
         var stocks =
             await _context.Watchlists.Where(e => e.IdUserNavigation.EmailAddress == username)
                 .Select(e => e.IdStockNavigation).ToListAsync();
-        var watchlist = new List<WatchlistDto>();
-        foreach (var stock in stocks)
+        var watchlistToReturn = new List<WatchlistDto>();
+        
+        stocks.ForEach(stock =>
         {
             var watchListDto = new WatchlistDto()
             {
@@ -37,13 +38,13 @@ public class WatchlistService : IWatchlistService
                 watchListDto.ImgUrl += $"&apiKey={_configuration["apiKey"]}";
             }
 
-            watchlist.Add(watchListDto);
-        }
-
+            watchlistToReturn.Add(watchListDto);
+        });
+        
         return new StatusResponse()
         {
             StatusCode = HttpStatusCode.OK,
-            Content = watchlist
+            UserWatchlist = watchlistToReturn
         };
     }
 
@@ -53,39 +54,39 @@ public class WatchlistService : IWatchlistService
 
         var idUser = (await _context.Users.SingleOrDefaultAsync(e => e.EmailAddress == username)).IdUser;
 
-        if (watchlist.FirstOrDefault(e => e.Ticker == ticker) == null)
+        if (watchlist.FirstOrDefault(e => e.TickerSymbol == ticker) == null)
         {
             _context.Watchlists.Add(new Watchlist()
             {
                 IdUser = idUser,
-                Ticker = ticker
+                TickerSymbol = ticker
             });
             await _context.SaveChangesAsync();
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = "Stock added to the watchlist"
+                Message = "Stock added to the watchlist"
             };
         }
 
         return new StatusResponse()
         {
-            StatusCode = HttpStatusCode.OK,
-            Content = "Stock was already added to the watchlist"
+            StatusCode = HttpStatusCode.BadRequest,
+            Message = "Stock was already added to the watchlist"
         };
     }
 
     public async Task<StatusResponse> DeleteFromWatchlistAsync(string username, string ticker)
     {
         var watchlist = await _context.Watchlists
-            .SingleOrDefaultAsync(e => e.IdUserNavigation.EmailAddress == username && e.Ticker == ticker);
+            .SingleOrDefaultAsync(e => e.IdUserNavigation.EmailAddress == username && e.TickerSymbol == ticker);
 
         if (watchlist == null)
         {
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.BadRequest,
-                Content = "Something went wrong"
+                Message = "Something went wrong"
             };
         }
 
@@ -95,7 +96,7 @@ public class WatchlistService : IWatchlistService
         return new StatusResponse()
         {
             StatusCode = HttpStatusCode.OK,
-            Content = "Stock deleted from watchlist"
+            Message = "Stock deleted from watchlist"
         };
     }
 }

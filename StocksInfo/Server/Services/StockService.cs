@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Server.Entities;
 using Shared.Models;
 using Shared.Models.Aggregates;
-using Result = Shared.Models.Aggregates.Result;
 
 namespace Server.Services;
 
@@ -44,7 +43,7 @@ public class StockService : IStockService
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = stockDto
+                StockDto = stockDto
             };
         }
 
@@ -71,6 +70,7 @@ public class StockService : IStockService
             {
                 stock.ListDate = DateTime.Parse(stockInfoDto.Results.ListDate);
             }
+
             if (stockInfoDto.Results.Branding != null)
             {
                 if (stockInfoDto.Results.Branding.LogoUrl != null)
@@ -84,7 +84,7 @@ public class StockService : IStockService
 
                 stock.ImgUrl += $"?apiKey={_configuration["apiKey"]}";
             }
-            
+
             await _context.Stocks.AddAsync(stock);
             await _context.SaveChangesAsync();
         }
@@ -101,10 +101,10 @@ public class StockService : IStockService
             return new StatusResponse()
             {
                 StatusCode = response.StatusCode,
-                Content = message
+                Message = message
             };
         }
-        
+
         stockDto = new StockDto()
         {
             TickerSymbol = stock.TickerSymbol,
@@ -120,7 +120,7 @@ public class StockService : IStockService
         return new StatusResponse()
         {
             StatusCode = HttpStatusCode.OK,
-            Content = stockDto
+            StockDto = stockDto
         };
     }
 
@@ -136,23 +136,20 @@ public class StockService : IStockService
         {
             var stockSearchResult = await response.Content.ReadFromJsonAsync<StocksSearchResultJsonModel>();
 
-            var stocksFound = new List<FoundStockDto>();
+            var stocksFoundToReturn = new List<FoundStockDto>();
 
 
-            foreach (var stock in stockSearchResult.Results)
+            stockSearchResult.Results.ForEach(stock => stocksFoundToReturn.Add(new FoundStockDto()
             {
-                stocksFound.Add(new FoundStockDto()
-                {
-                    TickerSymbol = stock.Ticker,
-                    Name = stock.Name,
-                    PrimaryExchange = stock.PrimaryExchange,
-                });
-            }
+                TickerSymbol = stock.Ticker,
+                Name = stock.Name,
+                PrimaryExchange = stock.PrimaryExchange,
+            }));
 
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = stocksFound
+                FoundStockDtos = stocksFoundToReturn
             };
         }
 
@@ -167,7 +164,7 @@ public class StockService : IStockService
         return new StatusResponse()
         {
             StatusCode = response.StatusCode,
-            Content = message
+            Message = message
         };
     }
 
@@ -176,21 +173,34 @@ public class StockService : IStockService
         var toDate = DateTime.Today.AddDays(-1);
         var fromDate = DateTime.Today.AddDays(-121);
 
-        var aggregateDtos = new List<AggregateDto>();
+        var aggregatesToReturn = new List<AggregateDto>();
 
         var aggregates = await _context
-            .Aggregates.Where(e => e.TickerSymbol == ticker &&  e.Date > fromDate).ToListAsync();
+            .Aggregates.Where(e => e.TickerSymbol == ticker && e.Date > fromDate).ToListAsync();
 
         if (aggregates.Count > 0)
         {
-            fromDate = aggregates.OrderByDescending(e => e.Date).FirstOrDefault().Date.AddDays(1);
+            fromDate = aggregates.OrderByDescending(e => e.Date).First().Date.AddDays(1);
 
             if (fromDate.AddDays(-1) == toDate)
             {
+                aggregates.ForEach(aggregate => aggregatesToReturn.Add(new AggregateDto()
+                {
+                    AveragePrice = aggregate.AveragePrice,
+                    Close = aggregate.Close,
+                    Date = aggregate.Date,
+                    High = aggregate.High,
+                    Low = aggregate.Low,
+                    NumberOfTransactions = aggregate.NumberOfTransactions,
+                    Open = aggregate.Open,
+                    Volume = aggregate.Volume,
+                    TickerSymbol = aggregate.TickerSymbol
+                }));
+
                 return new StatusResponse()
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = aggregates
+                    Aggregates = aggregatesToReturn
                 };
             }
         }
@@ -207,51 +217,29 @@ public class StockService : IStockService
         if (response.IsSuccessStatusCode)
         {
             var stockSearchResult = await response.Content.ReadFromJsonAsync<StockAggregateJsonModel>();
+
             var newAggregates = new List<Aggregate>();
+
             if (stockSearchResult.resultsCount != 0)
             {
                 newAggregates = stockSearchResult.results.ConvertAll(e => new Aggregate()
-                {
-                    TickerSymbol = ticker,
-                    Date = DateTimeOffset.FromUnixTimeMilliseconds(e.Time).UtcDateTime,
-                    Open = e.Open,
-                    Close = e.Close,
-                    High = e.High,
-                    Low = e.Low,
-                    NumberOfTransactions = e.NumberOfTransactions,
-                    Volume = e.Volume,
-                    AveragePrice = e.AveragePrice
-                }
+                    {
+                        TickerSymbol = ticker,
+                        Date = DateTimeOffset.FromUnixTimeMilliseconds(e.Time).UtcDateTime,
+                        Open = e.Open,
+                        Close = e.Close,
+                        High = e.High,
+                        Low = e.Low,
+                        NumberOfTransactions = e.NumberOfTransactions,
+                        Volume = e.Volume,
+                        AveragePrice = e.AveragePrice
+                    }
                 ).ToList();
                 await _context.Aggregates.AddRangeAsync(newAggregates);
                 await _context.SaveChangesAsync();
             }
-            foreach (var aggregate in aggregates.Concat(newAggregates))
-            {
-                aggregateDtos.Add( new ()
-                {
-                    AveragePrice = aggregate.AveragePrice,
-                    Close = aggregate.Close,
-                    Date = aggregate.Date,
-                    High = aggregate.High,
-                    Low = aggregate.Low,
-                    NumberOfTransactions = aggregate.NumberOfTransactions,
-                    Open = aggregate.Open,
-                    Volume = aggregate.Volume,
-                    TickerSymbol = aggregate.TickerSymbol
-                });
-            }
-            
-            return new StatusResponse()
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = aggregates.Concat(newAggregates).ToList()
-            };
-        }
-        
-        foreach (var aggregate in aggregates)
-        {
-            aggregateDtos.Add( new ()
+
+            aggregates.Concat(newAggregates).ToList().ForEach(aggregate => aggregatesToReturn.Add(new AggregateDto()
             {
                 AveragePrice = aggregate.AveragePrice,
                 Close = aggregate.Close,
@@ -260,19 +248,39 @@ public class StockService : IStockService
                 Low = aggregate.Low,
                 NumberOfTransactions = aggregate.NumberOfTransactions,
                 Open = aggregate.Open,
+                Volume = aggregate.Volume,
                 TickerSymbol = aggregate.TickerSymbol
-            });
+            }));
+
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Aggregates = aggregatesToReturn.ToList()
+            };
         }
+
+        aggregates.ForEach(aggregate => aggregatesToReturn.Add(new AggregateDto()
+        {
+            AveragePrice = aggregate.AveragePrice,
+            Close = aggregate.Close,
+            Date = aggregate.Date,
+            High = aggregate.High,
+            Low = aggregate.Low,
+            NumberOfTransactions = aggregate.NumberOfTransactions,
+            Open = aggregate.Open,
+            Volume = aggregate.Volume,
+            TickerSymbol = aggregate.TickerSymbol
+        }));
 
         if (aggregates.Count != 0)
         {
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = aggregates
+                Aggregates = aggregatesToReturn
             };
         }
-        
+
         if (response.StatusCode == HttpStatusCode.TooManyRequests)
         {
             await Task.Delay(TimeSpan.FromSeconds(20));
@@ -282,8 +290,7 @@ public class StockService : IStockService
         return new StatusResponse()
         {
             StatusCode = response.StatusCode,
-            Content = await response.Content.ReadAsStringAsync()
+            Message = await response.Content.ReadAsStringAsync()
         };
     }
 }
-

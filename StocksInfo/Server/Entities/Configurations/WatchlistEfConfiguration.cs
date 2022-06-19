@@ -9,13 +9,13 @@ public class WatchlistEfConfiguration : IEntityTypeConfiguration<Watchlist>
     public void Configure(EntityTypeBuilder<Watchlist> builder)
     {
         builder.HasKey(e =>
-            new {IdStock = e.IdUser, e.Ticker}).HasName("Watchlist_pk");
+            new {IdStock = e.IdUser, Ticker = e.TickerSymbol}).HasName("Watchlist_pk");
         
         builder.ToTable("Watchlist");
         
         builder.HasOne(e => e.IdStockNavigation)
             .WithMany(e => e.Watchlists)
-            .HasForeignKey(e => e.Ticker)
+            .HasForeignKey(e => e.TickerSymbol)
             .HasConstraintName("Watchlist_Stock")
             .OnDelete(DeleteBehavior.ClientSetNull);
         

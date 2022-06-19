@@ -28,7 +28,7 @@ public class UserController : ControllerBase
         
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
         return Ok("User registered");
     }
@@ -42,9 +42,9 @@ public class UserController : ControllerBase
         
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
-        return Ok(response.Content);
+        return Ok(response.UserDto);
     }
 
     [HttpGet]
@@ -55,10 +55,10 @@ public class UserController : ControllerBase
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
 
-        return Ok(response.Content);
+        return Ok(response.UserWatchlist);
     }
     
     [HttpPost]
@@ -69,7 +69,7 @@ public class UserController : ControllerBase
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
 
         return Ok();
@@ -83,7 +83,7 @@ public class UserController : ControllerBase
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
 
         return Ok();

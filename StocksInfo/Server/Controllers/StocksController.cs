@@ -25,10 +25,10 @@ public class StocksController : ControllerBase
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
 
-        return Ok(response.Content);
+        return Ok(response.StockDto);
     }
 
     [HttpGet]
@@ -39,10 +39,10 @@ public class StocksController : ControllerBase
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
 
-        return Ok(response.Content);
+        return Ok(response.FoundStockDtos);
     }
 
     [HttpGet]
@@ -53,9 +53,9 @@ public class StocksController : ControllerBase
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            return StatusCode((int) response.StatusCode, response.Content);
+            return StatusCode((int) response.StatusCode, response.Message);
         }
 
-        return Ok(response.Content);
+        return Ok(response.Aggregates);
     }
 }
