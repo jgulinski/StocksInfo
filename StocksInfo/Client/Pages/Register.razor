@@ -1,4 +1,5 @@
 @page "/register"
+@using Client.Services
 
 <h3>Register</h3>
 
@@ -39,6 +40,7 @@ else
 
     [Inject]
     HttpClient HttpClient { get; set; }
+    
 
     private readonly UserDto _userToRegister = new() {EmailAddress = "user@example.com", Password = "Password1!"};
     private bool _registerSuccessful;
@@ -47,6 +49,8 @@ else
 
     private async Task RegisterUser()
     {
+
+        
         _attemptToRegisterFailed = false;
 
         var httpResponseMessage = await HttpClient.PostAsJsonAsync(APIEndpoints.s_register, _userToRegister);

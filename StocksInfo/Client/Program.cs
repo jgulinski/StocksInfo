@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Client;
 using Client.Providers;
 using Client.Services;
+using Client.Static;
 using IgniteUI.Blazor.Controls;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -14,7 +15,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 
-builder.Services.AddSingleton(sp => new HttpClient {BaseAddress = new Uri("https://localhost:7013/")});
+builder.Services.AddSingleton(sp => new HttpClient {BaseAddress = new Uri(APIEndpoints.ServerBaseUrl)});
 
 builder.Services.AddBlazoredLocalStorage();
 

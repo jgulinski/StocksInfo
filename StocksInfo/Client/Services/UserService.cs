@@ -13,6 +13,10 @@ public class UserService : IUserService
         _httpClient = httpClient;
     }
     
+    
+    
+    
+    
     public async Task<List<WatchlistDto>> GetWatchlistAsync(string username)
     {
         var response = await _httpClient.GetAsync($"api/user/{username}/watchlist");

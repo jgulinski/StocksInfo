@@ -40,28 +40,25 @@ else
     </div>
 
     <div class="row me-4">
-        @if (Stock.ImgUrl != null)
-        {
-            <div class="col-md-4 mb-4 d-flex align-items-center justify-content-center">
-                <img width="250" src="@Stock.ImgUrl" alt="">
-            </div>
 
-            <div class="col-md-8 mb-4 px-5">
-                <h3>@Stock.Name</h3>
-                <div>
-                    <p>@Stock.Description</p>
-                </div>
+        <div class="col-md-4 mb-4 d-flex align-items-center justify-content-center">
+            @if (Stock.ImgUrl != null)
+            {
+                <img width="250" src="@Stock.ImgUrl" alt="">
+            }
+            else
+            {
+                <img width="250" src="https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png" alt="">
+            }
+        </div>
+
+        <div class="col-md-8 mb-4 px-5">
+            <h3>@Stock.Name</h3>
+            <div>
+                <p>@Stock.Description</p>
             </div>
-        }
-        else
-        {
-            <div class="col-md-4 mb-4 px-5">
-                <h3>@Stock.Name</h3>
-                <div>
-                    <p>@Stock.Description</p>
-                </div>
-            </div>
-        }
+        </div>
+
 
         <div class="row mt-5 mx-5">
             @if (Stock.HomepageUrl != null)
