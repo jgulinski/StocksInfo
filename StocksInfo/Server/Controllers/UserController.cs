@@ -44,7 +44,7 @@ public class UserController : ControllerBase
         {
             return StatusCode((int) response.StatusCode, response.Message);
         }
-        return Ok(response.UserDto);
+        return Ok(response.Message);
     }
 
     [HttpGet]

@@ -21,28 +21,30 @@ else
 {
     [Inject]
     AuthenticationStateProvider? AuthenticationStateProvider { get; set; }
-
+    
     [Inject]
     ILocalStorageService? LocalStorageService { get; set; }
-
+    
     bool _isAuthenticated;
-
+    
     private string? Username { get; set; }
-
+    
     protected override async Task OnInitializedAsync()
     {
+        
         if (LocalStorageService != null && await LocalStorageService.ContainKeyAsync("bearerToken"))
         {
             _isAuthenticated = true;
             var savedToken = await LocalStorageService.GetItemAsync<string>("bearerToken");
-
+    
             var handler = new JsonWebTokenHandler();
+            
             Username = handler.ReadJsonWebToken(savedToken).Subject;
-
+    
             await ((AppAuthenticationStateProvider) AuthenticationStateProvider).SignIn();
-
+    
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
-
+    
             StateHasChanged();
         }
     }

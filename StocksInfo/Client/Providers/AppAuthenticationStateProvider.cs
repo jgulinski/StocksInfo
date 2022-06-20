@@ -35,8 +35,6 @@ public class AppAuthenticationStateProvider : AuthenticationStateProvider
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
             
-            // Get claims from token and build authenticated user object
-
             var claims = ParseClaims(jwtSecurityToken);
             var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
             return new AuthenticationState(user);
@@ -50,7 +48,6 @@ public class AppAuthenticationStateProvider : AuthenticationStateProvider
     private IEnumerable<Claim> ParseClaims(JwtSecurityToken jwtSecurityToken)
     {
         IList<Claim> claims = jwtSecurityToken.Claims.ToList();
-        // The value of tokenContent.Subject is the user's email ???
         claims.Add(new Claim(ClaimTypes.Name, jwtSecurityToken.Subject));
         return claims;
     }
