@@ -19,11 +19,6 @@ public class UserService : IUserService
 
         if (response.IsSuccessStatusCode)
         {
-            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-                return new List<WatchlistDto>();
-            }
-
             return await response.Content.ReadFromJsonAsync<List<WatchlistDto>>();
         }
 
@@ -35,13 +30,7 @@ public class UserService : IUserService
     {
         var response = await _httpClient.DeleteAsync($"api/user/{username}/watchlist/{ticker}");
 
-        if (response.IsSuccessStatusCode)
-        {
-            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-            }
-        }
-        else
+        if (!response.IsSuccessStatusCode)
         {
             var message = await response.Content.ReadAsStringAsync();
             throw new Exception(message);
@@ -53,13 +42,7 @@ public class UserService : IUserService
         var postBody = new {Ticker = ticker};
         var response = await _httpClient.PostAsJsonAsync($"api/user/{username}/watchlist/{ticker}", postBody);
 
-        if (response.IsSuccessStatusCode)
-        {
-            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-            }
-        }
-        else
+        if (!response.IsSuccessStatusCode)
         {
             var message = await response.Content.ReadAsStringAsync();
             throw new Exception(message);
