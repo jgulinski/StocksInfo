@@ -4,7 +4,7 @@
 
 **Demo on azure:**  https://agreeable-pond-0f6cd5203.1.azurestaticapps.net/
 
-* Server side - communication with SQL Server Database and polygon.io API
+* Server side - communication with SQL Server Database, polygon.io API, FMP API
 * Client side - Blazor WebAssembly application
 * Authentication with JWT
 
