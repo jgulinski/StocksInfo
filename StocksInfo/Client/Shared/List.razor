@@ -23,25 +23,32 @@ else
                 <th class="align-middle text-center">Ticker</th>
                 <th class="align-middle text-center">Name</th>
                 <th class="align-middle text-center">Market Identifier</th>
+                <th class="align-middle text-center">Day</th>
+                <th class="align-middle text-center">Month</th>
+
             </tr>
             </thead>
             <tbody>
             @foreach (var item in Watchlist)
             {
+                Day = PriceChanges.Single(e => e.TickerSymbol == item.TickerSymbol).Day;
+                DayColor = Day > 0 ? "green" : "red";
+                Month = PriceChanges.Single(e => e.TickerSymbol == item.TickerSymbol).Month;
+                MonthColor = Month > 0 ? "green" : "red";
+                
                 <tr>
                     <td>
                         <div class="d-flex align-items-center justify-content-center p-1">
                             @if (item.ImgUrl != null)
                             {
-                                <img src="@item.ImgUrl" alt="" style="max-width:180px; max-height:90px; width: auto; height: auto">
+                                <img src="@item.ImgUrl" alt="" style="max-width:180px; width: auto; height: 80px">
                             }
                             else
                             {
-                                <img src="https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png" 
+                                <img src="https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png"
                                      alt="" style="max-width:180px; max-height:90px; width: auto; height: auto">
-
                             }
-                            
+
                         </div>
                     </td>
                     <td class="align-middle text-center">
@@ -53,6 +60,16 @@ else
                     <td class="align-middle text-center">
                         @item.MarketIdentifier
                     </td>
+                    
+                    <td class="align-middle text-center">
+                        <div style="color: @DayColor">@Day %</div>
+                    </td>
+
+                    <td class="align-middle text-center">
+                        <div style="color: @MonthColor">@Month %</div
+                        >
+                    </td>
+
                     <td class="align-middle">
                         <div class="col-md-12 text-center">
                             <a class="btn btn-primary" href="/stocks/@item.TickerSymbol">Details</a>
@@ -68,6 +85,14 @@ else
 }
 
 @code {
+
+    private double Day { get; set; }
+
+    private double Month { get; set; }
+
+    private string DayColor { get; set; }
+
+    private string MonthColor { get; set; }
 
     protected override void OnInitialized()
     {

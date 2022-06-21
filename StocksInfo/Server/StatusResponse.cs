@@ -18,4 +18,6 @@ public class StatusResponse
 
     public List<AggregateDto> Aggregates { get; set; }
     
+    public List<PriceChangeDto> PriceChanges { get; set; }
+    
 }

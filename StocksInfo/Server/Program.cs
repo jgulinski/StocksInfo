@@ -62,11 +62,21 @@ app.UseSwaggerUI(c =>
 
 
 app.UseHttpsRedirection();
+
 app.UseRouting();
+
+
+
 app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapFallbackToFile("index.html");
+});
 
 app.UseEndpoints(endpoints => { app.MapControllers(); });
 

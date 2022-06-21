@@ -9,4 +9,5 @@ public static class APIEndpoints
 #endif
     internal readonly static string s_register = $"{ServerBaseUrl}/api/user/register";
     internal readonly static string s_signIn = $"{ServerBaseUrl}/api/user/signin";
+    
 }

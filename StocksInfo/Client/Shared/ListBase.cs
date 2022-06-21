@@ -12,9 +12,15 @@ public class ListBase : ComponentBase
 
     [Inject]
     public IUserService UserService { get; set; }
+    
+    [Inject]
+    public IStockService StockService { get; set; }
 
     [Parameter]
     public string TickerSymbol { get; set; }
+    
+    [Parameter]
+    public List<PriceChangeDto> PriceChanges { get; set; } 
 
     protected ConfirmBase DeleteConfirmation { get; set; }
     protected List<WatchlistDto>? Watchlist { get; set; }
@@ -28,6 +34,10 @@ public class ListBase : ComponentBase
         try
         {
             Watchlist = await UserService.GetWatchlistAsync(Username);
+            
+            var tickers = Watchlist.Select(e => e.TickerSymbol).ToList();
+
+            PriceChanges = await StockService.GetStocksPriceChange(tickers);
         }
         catch (Exception e)
         {

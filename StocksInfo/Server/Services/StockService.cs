@@ -293,4 +293,33 @@ public class StockService : IStockService
             Message = await response.Content.ReadAsStringAsync()
         };
     }
+
+    public async Task<StatusResponse> GetPriceChangesAsync(string tickers)
+    {
+
+        var url =
+            $"https://financialmodelingprep.com/api/v3/stock-price-change/{tickers}" +
+            $"?apikey={_configuration["FMPapiKey"]}";
+
+        var priceChanges = new List<PriceChangeDto>();
+
+        var response = await _httpClient.GetAsync(url);
+
+        if (response.IsSuccessStatusCode)
+        {
+            priceChanges = await response.Content.ReadFromJsonAsync<List<PriceChangeDto>>();
+
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                PriceChanges = priceChanges
+            };
+        }
+
+        return new StatusResponse()
+        {
+            StatusCode = HttpStatusCode.NoContent,
+            PriceChanges = priceChanges
+        };
+    }
 }

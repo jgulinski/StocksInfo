@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Shared.Models;
 
-// json property name 
 public class StockJsonModel
 {
     public Content Results { get; set; }

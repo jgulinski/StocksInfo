@@ -66,5 +66,23 @@ public class StockService : IStockService
         var message = await response.Content.ReadAsStringAsync();
         throw new Exception(message);
     }
-    
+
+    public async Task<List<PriceChangeDto>> GetStocksPriceChange(List<string> tickers)
+    {
+        var tickersString = string.Join(",", tickers);
+        var response = await _httpClient.GetAsync($"api/stocks/priceChanges?tickers={tickersString}");
+            
+        if (response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return new List<PriceChangeDto>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<PriceChangeDto>>();
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        throw new Exception(message);
+    }
 }
