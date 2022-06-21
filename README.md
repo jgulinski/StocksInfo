@@ -1,6 +1,9 @@
 # Stocks Info
 
 ## Web app that allows you to get information about US Stocks
+
+**Demo on azure:**  https://agreeable-pond-0f6cd5203.1.azurestaticapps.net/
+
 * Server side - communication with SQL Server Database and polygon.io API
 * Client side - Blazor WebAssembly application
 * Authentication with JWT
@@ -15,7 +18,6 @@
 * SQL Server
 
 ## Future Plans
-* Deploying to Azure
 * Adding new functionalities
 
 ##
