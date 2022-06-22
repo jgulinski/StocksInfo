@@ -25,24 +25,25 @@
 ### Searching Stock
 
 
-<img width="720" alt="Screenshot 2022-06-16 at 8 06 14 PM" src="https://user-images.githubusercontent.com/79990066/174146560-9ee7783c-ff04-4d2a-aa2f-e69b3f5e8899.png">
+<img width="720" alt="Screenshot 2022-06-22 at 12 47 25 PM" src="https://user-images.githubusercontent.com/79990066/175011291-0bfd57cc-297d-4856-9a6e-9a95020b0435.png">
+
 
 
 ### Company information
 
 
-<img width="720" alt="Screenshot 2022-06-16 at 9 13 41 PM" src="https://user-images.githubusercontent.com/79990066/174147573-d1ff390a-2636-42c3-b2ee-93abf780cd92.png">
+<img width="720" alt="Screenshot 2022-06-22 at 12 47 29 PM" src="https://user-images.githubusercontent.com/79990066/175011326-97eda0e4-6102-411c-b96b-b8bf87653256.png">
 
 
 ### Aggregates
 
 
-<img width="720" alt="Screenshot 2022-06-16 at 8 06 42 PM" src="https://user-images.githubusercontent.com/79990066/174147649-9fc9a3e3-47d7-475e-a924-84f5f6d1f1d7.png">
+<img width="720" alt="Screenshot 2022-06-22 at 12 47 31 PM" src="https://user-images.githubusercontent.com/79990066/175011346-b6610dac-a053-42ec-be7b-a8cfcfc97a63.png">
 
 
 ### Watchlist
 
 
-<img width="720" alt="Screenshot 2022-06-16 at 8 06 51 PM" src="https://user-images.githubusercontent.com/79990066/174147678-6f7d1749-7d40-4d24-85ba-d3e5e7f52376.png">
+<img width="720" alt="Screenshot 2022-06-22 at 12 47 12 PM" src="https://user-images.githubusercontent.com/79990066/175011360-773a55e7-ef90-48fc-949f-565c5e53f912.png">
 
 
