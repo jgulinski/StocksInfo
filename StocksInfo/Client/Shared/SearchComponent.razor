@@ -12,10 +12,9 @@
                    ValueExpression="@(() => selectedStock)"
                    placeholder="Search...">
     <SelectedTemplate>
-        @context.Name
     </SelectedTemplate>
     <ResultTemplate>
-        @context.Name
+        @context.TickerSymbol | @context.Name | @context.StockExchange 
     </ResultTemplate>
 </BlazoredTypeahead>
 

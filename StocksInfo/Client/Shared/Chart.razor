@@ -4,6 +4,7 @@
 
 @if (Aggregates == null && ErrorMessage == null)
 {
+    <b>Longer delay may be caused by polygon.ai request per minute limit. Please wait</b>
     <Spinner/>
 }
 else if (ErrorMessage != null)
@@ -19,7 +20,6 @@ else
                                ChartType=FinancialChartType.Candle
                                Thickness=2
                                DataSource="Aggregates"
-                               
                                ZoomSliderType="FinancialChartZoomSliderType.None"
                                YAxisMode="FinancialChartYAxisMode.Numeric"
                                />

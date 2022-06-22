@@ -4,14 +4,9 @@ namespace Shared.Models;
 
 public class StocksSearchResultJsonModel
 {
-    public List<Result> Results { get; set; }
-    public string Status { get; set; }
-}
-public class Result
-{
-    public string Ticker { get; set; }
+    [JsonPropertyName("symbol")] public string TickerSymbol { get; set; }
     public string Name { get; set; }
-    [JsonPropertyName("primary_exchange")]public string PrimaryExchange { get; set; }
+
+    [JsonPropertyName("exchangeShortName")]
+    public string StockExchange { get; set; }
 }
-
-

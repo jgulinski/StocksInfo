@@ -126,24 +126,22 @@ public class StockService : IStockService
 
     public async Task<StatusResponse> GetStocksSearchResultAsync(string token)
     {
-        var url = "https://api.polygon.io/v3/reference/tickers?ticker.gte=" + token.ToUpper() +
-                  $"&active=true&sort=ticker&order=asc&limit=5&apiKey={_configuration["apiKey"]}";
-
+        var url =
+            $"https://financialmodelingprep.com/api/v3/search?query={token}&limit=10&exchange=NASDAQ,NSE,NYSE,FOREX&apikey={_configuration["FMPapiKey"]}";
 
         var response = await _httpClient.GetAsync(url);
 
         if (response.IsSuccessStatusCode)
         {
-            var stockSearchResult = await response.Content.ReadFromJsonAsync<StocksSearchResultJsonModel>();
+            var stockSearchResult = await response.Content.ReadFromJsonAsync<List<StocksSearchResultJsonModel>>();
 
             var stocksFoundToReturn = new List<FoundStockDto>();
-
-
-            stockSearchResult.Results.ForEach(stock => stocksFoundToReturn.Add(new FoundStockDto()
+            
+            stockSearchResult.ForEach(stock => stocksFoundToReturn.Add(new FoundStockDto()
             {
-                TickerSymbol = stock.Ticker,
+                TickerSymbol = stock.TickerSymbol,
                 Name = stock.Name,
-                PrimaryExchange = stock.PrimaryExchange,
+                StockExchange = stock.StockExchange,
             }));
 
             return new StatusResponse()
@@ -151,12 +149,6 @@ public class StockService : IStockService
                 StatusCode = HttpStatusCode.OK,
                 FoundStockDtos = stocksFoundToReturn
             };
-        }
-
-        if (response.StatusCode == HttpStatusCode.TooManyRequests)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(20));
-            return await GetStocksSearchResultAsync(token);
         }
 
         var message = await response.Content.ReadAsStringAsync();
@@ -296,7 +288,6 @@ public class StockService : IStockService
 
     public async Task<StatusResponse> GetPriceChangesAsync(string tickers)
     {
-
         var url =
             $"https://financialmodelingprep.com/api/v3/stock-price-change/{tickers}" +
             $"?apikey={_configuration["FMPapiKey"]}";

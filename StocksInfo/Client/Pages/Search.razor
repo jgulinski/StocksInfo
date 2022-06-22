@@ -1,6 +1,6 @@
 @page "/search"
 
-@if (!isAuthenticated)
+@if (!_isAuthenticated)
 {
     <h1>You are not authorized to access this page</h1>
 }
@@ -15,14 +15,14 @@ else
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
 
-    protected bool isAuthenticated = false;
+    private bool _isAuthenticated;
 
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationState).User;
         if (user.Identity.IsAuthenticated)
         {
-            isAuthenticated = true;
+            _isAuthenticated = true;
         }
     }
 }
