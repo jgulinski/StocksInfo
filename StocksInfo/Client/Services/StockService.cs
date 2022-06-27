@@ -67,7 +67,7 @@ public class StockService : IStockService
         throw new Exception(message);
     }
 
-    public async Task<List<PriceChangeDto>> GetStocksPriceChange(List<string> tickers)
+    public async Task<List<PriceChangeDto>> GetStocksPriceChange(IEnumerable<string> tickers)
     {
         var tickersString = string.Join(",", tickers);
         var response = await _httpClient.GetAsync($"api/stocks/priceChanges?tickers={tickersString}");
@@ -80,6 +80,24 @@ public class StockService : IStockService
             }
 
             return await response.Content.ReadFromJsonAsync<List<PriceChangeDto>>();
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        throw new Exception(message);
+    }
+
+    public async Task<List<ArticleDto>> GetStockArticles(string ticker)
+    {
+        var response = await _httpClient.GetAsync($"api/stocks/{ticker}/articles");
+            
+        if (response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return new List<ArticleDto>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<ArticleDto>>();
         }
 
         var message = await response.Content.ReadAsStringAsync();

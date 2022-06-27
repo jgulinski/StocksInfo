@@ -20,4 +20,6 @@ public class StatusResponse
     
     public List<PriceChangeDto> PriceChanges { get; set; }
     
+    public List<ArticleDto> Articles { get; set; }
+    
 }

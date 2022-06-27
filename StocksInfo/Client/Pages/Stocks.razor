@@ -95,8 +95,12 @@ else
 
     </div>
 
-    <div>
+    <div class="me-3">
         <Chart Ticker="@Stock.TickerSymbol"></Chart>
+    </div>
+
+    <div class="me-3 mt-5">
+        <Articles TickerSymbol="@Ticker"/>
     </div>
 }
 @code

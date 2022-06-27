@@ -1,0 +1,43 @@
+@using Client.Services
+@inject IStockService _stockService
+
+@if (ArticlesList == null)
+{
+    <Spinner/>
+}
+else
+{
+    <h3>Last @ArticlesList.Count articles</h3>
+
+    <div class="row mt-5 ms-5 me-5">
+
+        @foreach (var article in ArticlesList)
+        {
+            <div class="mb-1">
+                <a href="@article.Url" target="_blank">
+                    <h4>@article.Title</h4>
+                </a>
+                @article.Published
+            </div>
+
+            <div class="mb-4">
+                @article.Description
+            </div>
+        }
+
+    </div>
+}
+
+@code{
+
+    [Parameter]
+    public string TickerSymbol { get; set; }
+
+    private List<ArticleDto> ArticlesList { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ArticlesList = await _stockService.GetStockArticles(TickerSymbol);
+    }
+
+}

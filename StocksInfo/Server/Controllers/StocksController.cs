@@ -72,4 +72,19 @@ public class StocksController : ControllerBase
 
         return Ok(response.PriceChanges);
     }
+    
+    [HttpGet]
+    [Route("{ticker}/Articles")]
+    public async Task<IActionResult> GetArticles(string ticker)
+    {
+        var response = await _stockService.GetStockArticlesAsync(ticker);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return StatusCode((int) response.StatusCode, response.Message);
+        }
+
+        return Ok(response.Articles);
+    }
+    
 }

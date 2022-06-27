@@ -136,7 +136,7 @@ public class StockService : IStockService
             var stockSearchResult = await response.Content.ReadFromJsonAsync<List<StocksSearchResultJsonModel>>();
 
             var stocksFoundToReturn = new List<FoundStockDto>();
-            
+
             stockSearchResult.ForEach(stock => stocksFoundToReturn.Add(new FoundStockDto()
             {
                 TickerSymbol = stock.TickerSymbol,
@@ -311,6 +311,47 @@ public class StockService : IStockService
         {
             StatusCode = HttpStatusCode.NoContent,
             PriceChanges = priceChanges
+        };
+    }
+
+    public async Task<StatusResponse> GetStockArticlesAsync(string ticker)
+    {
+        var url =
+            $"https://api.polygon.io/v2/reference/news?ticker={ticker}&limit=5&apiKey={_configuration["apiKey"]}";
+
+        var response = await _httpClient.GetAsync(url);
+
+        var articlesDtos = new List<ArticleDto>();
+
+        if (response.IsSuccessStatusCode)
+        {
+            var articles = (await response.Content.ReadFromJsonAsync<ArticlesJsonModel>()).Results;
+
+
+            articles.ForEach(a => articlesDtos.Add(new ArticleDto()
+                {
+                    Publisher = a.Publisher.Name,
+                    Title = a.Title,
+                    Author = a.Author,
+                    Published = a.Published,
+                    Url = a.Url,
+                    Description = a.Description
+                }
+            ));
+            return new StatusResponse()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Articles = articlesDtos
+            };
+        }
+        
+        var message = await response.Content.ReadAsStringAsync();
+
+
+        return new StatusResponse()
+        {
+            StatusCode = HttpStatusCode.NotFound,
+            Message = message
         };
     }
 }

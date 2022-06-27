@@ -1,8 +1,5 @@
-@using IgniteUI.Blazor.Controls
 @using Client.Services
-@inject IIgniteUIBlazor _igniteUiBlazor
 @inherits ListBase
-@inject HttpClient _httpClient
 
 @if (@Watchlist == null)
 {
@@ -38,10 +35,10 @@ else
                 
                 <tr>
                     <td>
-                        <div class="d-flex align-items-center justify-content-center p-1">
+                        <div class="d-flex align-items-center justify-content-center p-1" >
                             @if (item.ImgUrl != null)
                             {
-                                <img src="@item.ImgUrl" alt="" style="max-width:180px; width: auto; height: 80px">
+                                <img src="@item.ImgUrl" alt="" style="max-width:180px; width: auto; height: 90px">
                             }
                             else
                             {
@@ -93,13 +90,7 @@ else
     private string DayColor { get; set; }
 
     private string MonthColor { get; set; }
-
-    protected override void OnInitialized()
-    {
-        IgbDataGridModule.Register(_igniteUiBlazor);
-        IgbButtonModule.Register(_igniteUiBlazor);
-    }
-
+    
     private void DeleteFromWatchList(string ticker)
     {
         TickerSymbol = ticker;

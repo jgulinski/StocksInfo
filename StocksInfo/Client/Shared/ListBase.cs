@@ -18,7 +18,6 @@ public class ListBase : ComponentBase
 
     [Parameter]
     public string TickerSymbol { get; set; }
-    
     [Parameter]
     public List<PriceChangeDto> PriceChanges { get; set; } 
 
@@ -34,6 +33,12 @@ public class ListBase : ComponentBase
         try
         {
             Watchlist = await UserService.GetWatchlistAsync(Username);
+
+            Watchlist.Where(e => e.ImgUrl == null)
+                .ToList()
+                .ForEach(e => 
+                    e.ImgUrl = "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png");
+            
             
             var tickers = Watchlist.Select(e => e.TickerSymbol).ToList();
 
