@@ -33,7 +33,7 @@ else
     [Parameter]
     public string TickerSymbol { get; set; }
 
-    private List<ArticleDto> ArticlesList { get; set; }
+    private List<ArticleDto>? ArticlesList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
