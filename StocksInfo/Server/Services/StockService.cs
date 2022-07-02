@@ -29,17 +29,8 @@ public class StockService : IStockService
 
         if (stock != null)
         {
-            stockDto = new StockDto()
-            {
-                Name = stock.Name,
-                Description = stock.Description,
-                HomepageUrl = stock.HomepageUrl,
-                ImgUrl = stock.ImgUrl,
-                IndustrialClassification = stock.IndustrialClassification,
-                ListDate = stock.ListDate,
-                MarketIdentifier = stock.MarketIdentifier,
-                TickerSymbol = stock.TickerSymbol
-            };
+            stockDto = Converters.StockToStockDtoConverter(stock);
+
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
@@ -47,46 +38,13 @@ public class StockService : IStockService
             };
         }
 
-        var url =
-            $"https://api.polygon.io/v3/reference/tickers/{ticker}?apiKey={_configuration["apiKey"]}";
+        var url = $"https://api.polygon.io/v3/reference/tickers/{ticker}?apiKey={_configuration["apiKey"]}";
 
         var response = await _httpClient.GetAsync(url);
 
         if (response.IsSuccessStatusCode)
         {
-            var stockInfoDto = await response.Content.ReadFromJsonAsync<StockJsonModel>();
-
-            stock = new Stock()
-            {
-                TickerSymbol = stockInfoDto.Results.Ticker,
-                Name = stockInfoDto.Results.Name,
-                MarketIdentifier = stockInfoDto.Results.MarketIdentifier,
-                Description = stockInfoDto.Results.Description,
-                IndustrialClassification = stockInfoDto.Results.IndustrialClassification,
-                HomepageUrl = stockInfoDto.Results.HomepageUrl,
-            };
-
-            if (stockInfoDto.Results.ListDate != null)
-            {
-                stock.ListDate = DateTime.Parse(stockInfoDto.Results.ListDate);
-            }
-
-            if (stockInfoDto.Results.Branding != null)
-            {
-                if (stockInfoDto.Results.Branding.LogoUrl != null)
-                {
-                    stock.ImgUrl = stockInfoDto.Results.Branding.LogoUrl;
-                }
-                else
-                {
-                    stock.ImgUrl = stockInfoDto.Results.Branding.IconUrl;
-                }
-
-                stock.ImgUrl += $"?apiKey={_configuration["apiKey"]}";
-            }
-
-            await _context.Stocks.AddAsync(stock);
-            await _context.SaveChangesAsync();
+            stock = await AddNewStockToContext(response);
         }
         else
         {
@@ -105,17 +63,7 @@ public class StockService : IStockService
             };
         }
 
-        stockDto = new StockDto()
-        {
-            TickerSymbol = stock.TickerSymbol,
-            Name = stock.Name,
-            MarketIdentifier = stock.MarketIdentifier,
-            Description = stock.Description,
-            IndustrialClassification = stock.IndustrialClassification,
-            HomepageUrl = stock.HomepageUrl,
-            ListDate = stock.ListDate,
-            ImgUrl = stock.ImgUrl
-        };
+        stockDto = Converters.StockToStockDtoConverter(stock);
 
         return new StatusResponse()
         {
@@ -137,7 +85,7 @@ public class StockService : IStockService
 
             var stocksFoundToReturn = new List<FoundStockDto>();
 
-            stockSearchResult.ForEach(stock => stocksFoundToReturn.Add(new FoundStockDto()
+            stockSearchResult?.ForEach(stock => stocksFoundToReturn.Add(new FoundStockDto()
             {
                 TickerSymbol = stock.TickerSymbol,
                 Name = stock.Name,
@@ -172,9 +120,9 @@ public class StockService : IStockService
 
         if (aggregates.Count > 0)
         {
-            fromDate = aggregates.OrderByDescending(e => e.Date).First().Date.AddDays(1);
+            fromDate = aggregates.OrderByDescending(e => e.Date).First().Date;
 
-            if (fromDate.AddDays(-1) == toDate)
+            if (fromDate == toDate)
             {
                 aggregates.ForEach(aggregate => aggregatesToReturn.Add(new AggregateDto()
                 {
@@ -195,11 +143,13 @@ public class StockService : IStockService
                     Aggregates = aggregatesToReturn
                 };
             }
+
+            fromDate = fromDate.AddDays(1);
         }
 
         var url =
             $"https://api.polygon.io/v2/aggs/ticker/{ticker}" +
-            $"/range/1/day/" +
+            "/range/1/day/" +
             $"{fromDate.ToString("yyyy-MM-dd")}/" +
             $"{toDate.ToString("yyyy-MM-dd")}" +
             $"?adjusted=false&sort=asc&limit=120&apiKey={_configuration["apiKey"]}";
@@ -212,7 +162,7 @@ public class StockService : IStockService
 
             var newAggregates = new List<Aggregate>();
 
-            if (stockSearchResult.resultsCount != 0)
+            if (stockSearchResult != null && stockSearchResult.resultsCount != 0)
             {
                 newAggregates = stockSearchResult.results.ConvertAll(e => new Aggregate()
                     {
@@ -321,14 +271,14 @@ public class StockService : IStockService
 
         var response = await _httpClient.GetAsync(url);
 
-        var articlesDtos = new List<ArticleDto>();
+        var articleDtoList = new List<ArticleDto>();
 
         if (response.IsSuccessStatusCode)
         {
-            var articles = (await response.Content.ReadFromJsonAsync<ArticlesJsonModel>()).Results;
+            var articles = (await response.Content.ReadFromJsonAsync<ArticlesJsonModel>())?.Results;
 
 
-            articles.ForEach(a => articlesDtos.Add(new ArticleDto()
+            articles?.ForEach(a => articleDtoList.Add(new ArticleDto()
                 {
                     Publisher = a.Publisher.Name,
                     Title = a.Title,
@@ -341,10 +291,16 @@ public class StockService : IStockService
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.OK,
-                Articles = articlesDtos
+                Articles = articleDtoList
             };
         }
         
+        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(20));
+            return await GetStockArticlesAsync(ticker);
+        }
+
         var message = await response.Content.ReadAsStringAsync();
 
 
@@ -353,5 +309,28 @@ public class StockService : IStockService
             StatusCode = HttpStatusCode.NotFound,
             Message = message
         };
+    }
+
+    private async Task<Stock> AddNewStockToContext(HttpResponseMessage response)
+    {
+        var stockJsonModel = await response.Content.ReadFromJsonAsync<StockJsonModel>();
+
+        Stock stock = Converters.StockJsonModelToStockConverter(stockJsonModel);
+
+        if (stockJsonModel.Results.Branding?.LogoUrl != null)
+        {
+            stock.ImgUrl = stockJsonModel.Results.Branding.LogoUrl;
+            stock.ImgUrl += $"?apiKey={_configuration["apiKey"]}";
+        }
+        else if (stockJsonModel.Results.Branding?.IconUrl != null)
+        {
+            stock.ImgUrl = stockJsonModel.Results.Branding.IconUrl;
+            stock.ImgUrl += $"?apiKey={_configuration["apiKey"]}";
+        }
+
+        await _context.Stocks.AddAsync(stock);
+        await _context.SaveChangesAsync();
+
+        return stock;
     }
 }

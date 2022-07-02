@@ -52,13 +52,13 @@ public class WatchlistService : IWatchlistService
     {
         var watchlist = await _context.Watchlists.Where(e => e.IdUserNavigation.EmailAddress == username).ToListAsync();
 
-        var idUser = (await _context.Users.SingleOrDefaultAsync(e => e.EmailAddress == username)).IdUser;
+        var idUser = (await _context.Users.SingleOrDefaultAsync(e => e.EmailAddress == username))?.IdUser;
 
-        if (watchlist.FirstOrDefault(e => e.TickerSymbol == ticker) == null)
+        if (watchlist.FirstOrDefault(e => e.TickerSymbol == ticker) == null && idUser != null)
         {
             _context.Watchlists.Add(new Watchlist()
             {
-                IdUser = idUser,
+                IdUser = idUser.Value,
                 TickerSymbol = ticker
             });
             await _context.SaveChangesAsync();
@@ -86,7 +86,7 @@ public class WatchlistService : IWatchlistService
             return new StatusResponse()
             {
                 StatusCode = HttpStatusCode.BadRequest,
-                Message = "Something went wrong"
+                Message = "Watchlist not found"
             };
         }
 
